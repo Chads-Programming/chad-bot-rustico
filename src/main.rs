@@ -1,5 +1,6 @@
 mod bot;
 mod commands;
+mod utils;
 
 use shuttle_runtime::SecretStore;
 

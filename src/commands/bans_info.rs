@@ -8,10 +8,12 @@ fn ban_message(ban: Ban) -> String {
 
     format!("**pibardo:** `{user}`\n**razón:** `{reason}`")
 }
+ 
 
 pub async fn run(ctx: &Context, command: &CommandInteraction) -> String {
     let guild_id = command.guild_id.unwrap();
     let http = &ctx.http;
+    
 
     match http.get_guild(guild_id).await {
         Ok(guild) => {
