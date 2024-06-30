@@ -1,4 +1,4 @@
-use serenity::all::{Message, MessageBuilder, ResolvedOption, ResolvedValue};
+use serenity::all::{Message, MessageBuilder};
 use serenity::async_trait;
 use serenity::{
     all::{
