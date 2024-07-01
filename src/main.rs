@@ -1,6 +1,7 @@
 mod bot;
 mod commands;
 mod utils;
+mod gifs;
 
 use shuttle_runtime::SecretStore;
 

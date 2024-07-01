@@ -1,4 +1,4 @@
-use serenity::all::{Message, MessageBuilder};
+use serenity::all::{CommandInteraction, CreateEmbed};
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -10,15 +10,64 @@ use serenity::{
 
 use tracing::log::info;
 
-use crate::{commands, utils};
+use crate::{commands, gifs, utils};
 
 struct Handler {
     pub guild_id: u64,
 }
 
+struct ContentPayload {
+    content: Option<String>,
+    ephemeral: bool,
+}
+
+impl ContentPayload {
+    pub fn simple(content: Option<String>) -> Self {
+        Self {
+            content,
+            ephemeral: false,
+        }
+    }
+
+    pub fn simple_ephemeral(content: Option<String>) -> Self {
+        Self {
+            content,
+            ephemeral: true,
+        }
+    }
+
+    pub fn new(content: Option<String>, ephemeral: bool) -> Self {
+        Self { content, ephemeral }
+    }
+
+    pub fn default() -> Self {
+        Self {
+            content: Some("Not implemented".to_string()),
+            ephemeral: false,
+        }
+    }
+}
+
 impl Handler {
     pub fn new(guild_id: u64) -> Self {
         Self { guild_id }
+    }
+
+    pub async fn dispatch_response(
+        ctx: &Context,
+        command: &CommandInteraction,
+        content: String,
+        ephemeral: bool,
+    ) {
+        let data = CreateInteractionResponseMessage::new()
+            .content(content)
+            .ephemeral(ephemeral);
+
+        let builder: CreateInteractionResponse = CreateInteractionResponse::Message(data);
+
+        if let Err(why) = command.create_response(&ctx.http, builder).await {
+            info!("Cannot respond to slash command: {}", why);
+        }
     }
 }
 
@@ -26,57 +75,38 @@ impl Handler {
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
-            let content = match command.data.name.as_str() {
-                "say_hello" => Some(commands::say_hello::run(&command.data.options())),
-                "fox" => Some(commands::fox::run(&command.user, &command.data.options())),
-                "bans_info" => Some(commands::bans_info::run(&ctx, &command).await),
+            let content_payload = match command.data.name.as_str() {
+                "say_hello" => {
+                    ContentPayload::simple(Some(commands::say_hello::run(&command.data.options())))
+                }
+                "fox" => ContentPayload::simple(Some(commands::fox::run(
+                    &command.user,
+                    &command.data.options(),
+                ))),
+                "bans_info" => {
+                    ContentPayload::simple(Some(commands::bans_info::run(&ctx, &command).await))
+                }
                 "warn" => {
                     let user_option = utils::get_user_from_query(&command.data.options());
 
-                    match user_option {
+                    let content = match user_option {
                         Some(user) => Some(commands::warn::run(&ctx, &user).await),
                         None => Some("Debe establecer un usuario".to_string()),
-                    }
+                    };
+
+                    ContentPayload::simple_ephemeral(content)
                 }
-                _ => Some("not implemented :(".to_string()),
+                _ => ContentPayload::default(),
             };
 
-            if let Some(content) = content {
-                let data = CreateInteractionResponseMessage::new().content(content);
-                let builder: CreateInteractionResponse = CreateInteractionResponse::Message(data);
-                if let Err(why) = command.create_response(&ctx.http, builder).await {
-                    info!("Cannot respond to slash command: {}", why);
-                }
+            if let Some(content) = content_payload.content {
+                Handler::dispatch_response(&ctx, &command, content, content_payload.ephemeral)
+                    .await;
             }
-        }
-    }
-
-    async fn message(&self, ctx: Context, msg: Message) {
-        let channel = match msg.channel_id.to_channel(&ctx).await {
-            Ok(channel) => channel,
-            Err(why) => {
-                println!("Error getting channel: {why:?}");
-
-                return;
-            }
-        };
-
-        let response = MessageBuilder::new()
-            .push("User")
-            .push_bold_safe(&msg.author.name)
-            .push(" used the 'ping' command in the ")
-            .mention(&channel)
-            .push(" channel")
-            .build();
-
-        if let Err(why) = msg.channel_id.say(&ctx.http, &response).await {
-            println!("Error sending message: {why:?}");
         }
     }
 
     async fn ready(&self, ctx: Context, _ready: Ready) {
-        // println!("{} is connected!", ready.user.name);
-
         let guild_id = GuildId::new(self.guild_id);
 
         let commands = guild_id
