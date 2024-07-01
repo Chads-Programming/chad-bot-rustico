@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, CreateEmbed};
+use serenity::all::CommandInteraction;
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -10,7 +10,7 @@ use serenity::{
 
 use tracing::log::info;
 
-use crate::{commands, gifs, utils};
+use crate::{commands, utils};
 
 struct Handler {
     pub guild_id: u64,
