@@ -1,5 +1,5 @@
 ## Chad-bot rústico
-Bot de la comunidad de Discord de la comunidad de chads programming.
+Bot de la comunidad de [Discord](https://discord.gg/FSKeeDhMNN).
 
 ## Desarrollo
 
