@@ -36,10 +36,6 @@ impl ContentPayload {
         }
     }
 
-    pub fn new(content: Option<String>, ephemeral: bool) -> Self {
-        Self { content, ephemeral }
-    }
-
     pub fn default() -> Self {
         Self {
             content: Some("Not implemented".to_string()),
@@ -74,6 +70,7 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
                 "say_hello" => {
@@ -85,6 +82,12 @@ impl EventHandler for Handler {
                 ))),
                 "bans_info" => {
                     ContentPayload::simple(Some(commands::bans_info::run(&ctx, &command).await))
+                }
+                "propose_project" => {
+                    commands::propose_project::run(&ctx, &command)
+                        .await
+                        .unwrap();
+                    ContentPayload::default()
                 }
                 "warn" => {
                     let user_option = utils::get_user_from_query(&command.data.options());
@@ -117,6 +120,7 @@ impl EventHandler for Handler {
                     commands::fox::register(),
                     commands::bans_info::register(),
                     commands::warn::register(),
+                    commands::propose_project::register(),
                 ],
             )
             .await
