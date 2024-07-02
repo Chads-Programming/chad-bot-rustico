@@ -70,7 +70,6 @@ impl Handler {
 #[async_trait]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
                 "say_hello" => {
@@ -88,6 +87,9 @@ impl EventHandler for Handler {
                         .await
                         .unwrap();
                     ContentPayload::default()
+                }
+                "list_projects" => {
+                    ContentPayload::simple(Some(commands::list_projects::run(&ctx).await.unwrap()))
                 }
                 "warn" => {
                     let user_option = utils::get_user_from_query(&command.data.options());
@@ -121,6 +123,7 @@ impl EventHandler for Handler {
                     commands::bans_info::register(),
                     commands::warn::register(),
                     commands::propose_project::register(),
+                    commands::list_projects::register(),
                 ],
             )
             .await

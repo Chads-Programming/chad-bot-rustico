@@ -515,6 +515,7 @@ dependencies = [
  "anyhow",
  "axum 0.7.5",
  "chrono",
+ "serde",
  "serenity",
  "shuttle-runtime",
  "shuttle-serenity",
@@ -2848,6 +2849,7 @@ dependencies = [
  "thiserror",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -2929,6 +2931,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2968,6 +2971,7 @@ dependencies = [
  "stringprep",
  "thiserror",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2993,6 +2997,7 @@ dependencies = [
  "tracing",
  "url",
  "urlencoding",
+ "uuid",
 ]
 
 [[package]]
