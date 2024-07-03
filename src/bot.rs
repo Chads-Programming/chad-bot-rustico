@@ -79,6 +79,13 @@ impl EventHandler for Handler {
                     &command.user,
                     &command.data.options(),
                 ))),
+                "members_count" => {
+                    let message = Some(match commands::members_count::run(&ctx, &command).await {
+                        Ok(msg) => String::from(msg),
+                        Err(error_msg) => error_msg.to_string(),
+                    });
+                    ContentPayload::simple(message)
+                }
                 "bans_info" => {
                     ContentPayload::simple(Some(commands::bans_info::run(&ctx, &command).await))
                 }
@@ -89,7 +96,11 @@ impl EventHandler for Handler {
                     ContentPayload::default()
                 }
                 "list_projects" => {
-                    ContentPayload::simple(Some(commands::list_projects::run(&ctx).await.unwrap()))
+                    let message = Some(match commands::list_projects::run(&ctx).await {
+                        Ok(msg) => String::from(msg),
+                        Err(error_msg) => error_msg.to_string(),
+                    });
+                    ContentPayload::simple(message)
                 }
                 "warn" => {
                     let user_option = utils::get_user_from_query(&command.data.options());
@@ -120,6 +131,7 @@ impl EventHandler for Handler {
                 vec![
                     commands::say_hello::register(),
                     commands::fox::register(),
+                    commands::members_count::register(),
                     commands::bans_info::register(),
                     commands::warn::register(),
                     commands::propose_project::register(),
