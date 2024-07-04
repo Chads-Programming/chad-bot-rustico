@@ -8,9 +8,8 @@ use serenity::{
     Client,
 };
 
-use tracing::log::info;
-
 use crate::{commands, utils};
+use tracing::log::info;
 
 struct Handler {
     pub guild_id: u64,
@@ -22,18 +21,17 @@ struct ContentPayload {
 }
 
 impl ContentPayload {
-    pub fn simple(content: Option<String>) -> Self {
+    pub fn from_str(content: String) -> Self {
         Self {
-            content,
+            content: Some(content),
             ephemeral: false,
         }
     }
 
-    pub fn simple_ephemeral(content: Option<String>) -> Self {
-        Self {
-            content,
-            ephemeral: true,
-        }
+    pub fn ephemeral(mut self, ephemeral: bool) -> Self {
+        self.ephemeral = ephemeral;
+
+        self
     }
 
     pub fn default() -> Self {
@@ -67,27 +65,31 @@ impl Handler {
     }
 }
 
+impl From<Result<String, serenity::Error>> for ContentPayload {
+    fn from(result: Result<String, serenity::Error>) -> Self {
+        match result {
+            Ok(msg) => Self::from_str(msg),
+            Err(_) => Self::default(),
+        }
+    }
+}
+
 #[async_trait]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
                 "say_hello" => {
-                    ContentPayload::simple(Some(commands::say_hello::run(&command.data.options())))
+                    ContentPayload::from_str(commands::say_hello::run(&command.data.options()))
                 }
-                "fox" => ContentPayload::simple(Some(commands::fox::run(
+                "fox" => ContentPayload::from_str(commands::fox::run(
                     &command.user,
                     &command.data.options(),
-                ))),
-                "members_count" => {
-                    let message = Some(match commands::members_count::run(&ctx, &command).await {
-                        Ok(msg) => String::from(msg),
-                        Err(error_msg) => error_msg.to_string(),
-                    });
-                    ContentPayload::simple(message)
-                }
+                )),
+                "members_count" => commands::members_count::run(&ctx, &command).await.into(),
                 "bans_info" => {
-                    ContentPayload::simple(Some(commands::bans_info::run(&ctx, &command).await))
+                    ContentPayload::from_str(commands::bans_info::run(&ctx, &command).await)
+                        .ephemeral(true)
                 }
                 "propose_project" => {
                     commands::propose_project::run(&ctx, &command)
@@ -95,22 +97,16 @@ impl EventHandler for Handler {
                         .unwrap();
                     ContentPayload::default()
                 }
-                "list_projects" => {
-                    let message = Some(match commands::list_projects::run(&ctx).await {
-                        Ok(msg) => String::from(msg),
-                        Err(error_msg) => error_msg.to_string(),
-                    });
-                    ContentPayload::simple(message)
-                }
+                "list_projects" => commands::list_projects::run(&ctx).await.into(),
                 "warn" => {
                     let user_option = utils::get_user_from_query(&command.data.options());
 
                     let content = match user_option {
-                        Some(user) => Some(commands::warn::run(&ctx, &user).await),
-                        None => Some("Debe establecer un usuario".to_string()),
+                        Some(user) => commands::warn::run(&ctx, &user).await,
+                        None => "Debe establecer un usuario".to_string(),
                     };
 
-                    ContentPayload::simple_ephemeral(content)
+                    ContentPayload::from_str(content).ephemeral(true)
                 }
                 _ => ContentPayload::default(),
             };
