@@ -6,7 +6,7 @@ mod projects;
 mod state;
 mod utils;
 mod errors;
-
+mod events;
 use std::sync::Arc;
 
 use projects::repository::ProjectRepository;
