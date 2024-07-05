@@ -1,14 +1,18 @@
 mod bot;
 mod commands;
 mod db;
+mod errors;
 mod gifs;
+mod github;
 mod projects;
 mod state;
 mod utils;
-mod errors;
 mod events;
+mod consts;
+
 use std::sync::Arc;
 
+use octorust::{auth::Credentials, Client};
 use projects::repository::ProjectRepository;
 use shuttle_runtime::SecretStore;
 use state::SharedState;
@@ -28,13 +32,23 @@ async fn main(
         .parse()
         .expect("integer required");
 
+    let github_token = secret_store.get("GITHUB_TOKEN").expect("github token required");
+
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
     let client = bot::setup(token, guild_id).await;
     let pool = db::get_pool(&connection_url.clone()).await;
 
+    let github_client = Client::new(
+        String::from("user-agent-name"),
+        Credentials::Token(github_token),
+    )
+    .unwrap();
+
     let mut data = client.data.write().await;
+
     data.insert::<SharedState>(SharedState {
         project_repository: ProjectRepository::new(Arc::new(pool)),
+        github_client,
     });
 
     drop(data);
