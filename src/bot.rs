@@ -108,6 +108,7 @@ impl EventHandler for Handler {
 
                     ContentPayload::from_str(content).ephemeral(true)
                 }
+                "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
                 _ => ContentPayload::default(),
             };
 
@@ -132,6 +133,7 @@ impl EventHandler for Handler {
                     commands::warn::register(),
                     commands::propose_project::register(),
                     commands::list_projects::register(),
+                    commands::coders_leaderboard::register(),
                 ],
             )
             .await
