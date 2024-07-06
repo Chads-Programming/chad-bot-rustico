@@ -1,4 +1,4 @@
-use serenity::all::{CacheHttp, CommandInteraction, EditMessage, Message};
+use serenity::all::{CommandInteraction, Message};
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -9,7 +9,7 @@ use serenity::{
 };
 
 use crate::{commands, events, utils};
-use tracing::log::info;
+use tracing::log::{info, error as log_error};
 
 struct Handler {
     pub guild_id: u64,
@@ -77,7 +77,9 @@ impl From<Result<String, serenity::Error>> for ContentPayload {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        events::twitter_links_message::handle(&ctx, &msg).await;
+        if let Err(err) = events::twitter_links_message::handle(&ctx, &msg).await {
+            log_error!("Error on intercept message: {:?}", err)
+        }
     }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
