@@ -1,4 +1,4 @@
-use serenity::all::CommandInteraction;
+use serenity::all::{CommandInteraction, Message};
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -8,8 +8,8 @@ use serenity::{
     Client,
 };
 
-use crate::{commands, utils};
-use tracing::log::info;
+use crate::{commands, events, utils};
+use tracing::log::{info, error as log_error};
 
 struct Handler {
     pub guild_id: u64,
@@ -76,6 +76,11 @@ impl From<Result<String, serenity::Error>> for ContentPayload {
 
 #[async_trait]
 impl EventHandler for Handler {
+    async fn message(&self, ctx: Context, msg: Message) {
+        if let Err(err) = events::twitter_links_message::handle(&ctx, &msg).await {
+            log_error!("Error on intercept message: {:?}", err)
+        }
+    }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
@@ -144,8 +149,12 @@ impl EventHandler for Handler {
 }
 
 pub async fn setup(token: String, guild_id: u64) -> Client {
+    let intents = GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::GUILDS
+        | GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
     // Build our client.
-    Client::builder(token, GatewayIntents::empty())
+    Client::builder(token, intents)
         .event_handler(Handler::new(guild_id))
         .await
         .expect("Err creating client")

@@ -7,6 +7,7 @@ mod github;
 mod projects;
 mod state;
 mod utils;
+mod events;
 mod consts;
 
 use std::sync::Arc;
