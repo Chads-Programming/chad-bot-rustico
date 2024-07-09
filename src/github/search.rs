@@ -3,17 +3,16 @@ use octorust::{
     Client,
 };
 
+use crate::errors::CustomError;
+
 pub struct SearchRepositoryQuery {
     min_stars: Option<u32>,
-    topics: Vec<String>,
+    topics: Vec<&'static str>,
 }
 
 impl SearchRepositoryQuery {
-    pub fn new(min_stars: Option<u32>, topics: Vec<String>) -> Self {
-        Self {
-            min_stars,
-            topics,
-        }
+    pub fn new(min_stars: Option<u32>, topics: Vec<&'static str>) -> Self {
+        Self { min_stars, topics }
     }
 
     pub fn get_raw_query(&self) -> String {
@@ -32,17 +31,21 @@ impl SearchRepositoryQuery {
 pub async fn trending_repositories(
     client: &Client,
     query: &SearchRepositoryQuery,
-) -> Vec<RepoSearchResultItem> {
+    per_page: i64,
+) -> Result<Vec<RepoSearchResultItem>, CustomError> {
     let result = client
         .search()
         .repos(
             &query.get_raw_query(),
             SearchReposSort::Updated,
             Order::Desc,
-            10,
+            per_page,
             1,
         )
         .await;
 
-    vec![]
+    match result {
+        Ok(response) => Ok(response.body.items),
+        Err(err) => Err(CustomError::RequestError(format!("Error on fetch repos: {:?}", err))),
+    }
 }

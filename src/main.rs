@@ -7,14 +7,14 @@ mod events;
 mod gifs;
 mod github;
 mod projects;
+mod router;
 mod state;
 mod utils;
+mod cronjobs;
 
 use std::sync::Arc;
 
-use axum::http::StatusCode;
-use axum::response::IntoResponse;
-use axum::{routing::get, Router, ServiceExt};
+use axum::{Router, ServiceExt};
 use octorust::{auth::Credentials, Client as GithubClient};
 use projects::repository::ProjectRepository;
 use serenity::Client as DiscordClient;
@@ -47,6 +47,7 @@ impl shuttle_runtime::Service for CustomService {
             _ = self.discord_client.start() => {},
             _ = serve_router => {},
         };
+
         Ok(())
     }
 }
@@ -67,7 +68,7 @@ async fn main(
         .expect("github token required");
 
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
-    let client = bot::setup(token, guild_id).await;
+    let discord_client = bot::setup(token, guild_id).await;
     let pool = db::get_pool(&connection_url.clone()).await;
 
     let github_client = GithubClient::new(
@@ -77,27 +78,30 @@ async fn main(
     .unwrap();
 
     {
-        let mut data = client.data.write().await;
+        let mut data = discord_client.data.write().await;
 
         data.insert::<SharedState>(SharedState {
             project_repository: ProjectRepository::new(Arc::new(pool)),
-            github_client,
+            github_client: github_client.clone(),
         });
     }
 
-    let router = build_router();
+    let router = router::build_router();
+
+    let git_client_clone = github_client.clone();
+    let http = discord_client.http.clone();
+
+    let trending_job = async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(consts::TRENDING_RATE_JOB)).await;
+
+            cronjobs::trends::send_trends(&git_client_clone, &http).await
+        }
+    };
+    tokio::spawn(trending_job);
 
     Ok(CustomService {
-        discord_client: client,
-        router
+        discord_client,
+        router,
     })
-}
-
-
-pub fn build_router() -> Router {
-    Router::new().route("/", get(hello_world))
-}
-
-pub async fn hello_world() -> impl IntoResponse {
-    (StatusCode::OK, "Hello worldss!").into_response()
 }
