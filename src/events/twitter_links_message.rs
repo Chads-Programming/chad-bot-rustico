@@ -9,7 +9,8 @@ pub async fn handle(ctx: &Context, msg: &Message) -> Result<Option<Message>, ser
     }
 
     let new_content: String = get_new_messages(msg);
-    if !new_content.is_empty() {
+
+    if new_content.is_empty() {
         return Ok(None);
     }
     
