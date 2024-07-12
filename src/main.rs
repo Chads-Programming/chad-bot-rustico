@@ -1,6 +1,7 @@
 mod bot;
 mod commands;
 mod consts;
+mod cronjobs;
 mod db;
 mod errors;
 mod events;
@@ -10,13 +11,13 @@ mod projects;
 mod router;
 mod state;
 mod utils;
-mod cronjobs;
 
 use std::sync::Arc;
 
 use axum::{Router, ServiceExt};
 use octorust::{auth::Credentials, Client as GithubClient};
 use projects::repository::ProjectRepository;
+use router::setup::{RouterSecrets, RouterState};
 use serenity::Client as DiscordClient;
 use shuttle_runtime::SecretStore;
 use state::SharedState;
@@ -67,6 +68,10 @@ async fn main(
         .get("GITHUB_TOKEN")
         .expect("github token required");
 
+    let bot_api_key = secret_store
+        .get("API_KEY")
+        .expect("bot api jey required");
+
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
     let discord_client = bot::setup(token, guild_id).await;
     let pool = db::get_pool(&connection_url.clone()).await;
@@ -86,7 +91,12 @@ async fn main(
         });
     }
 
-    let router = router::build_router();
+    let router = router::setup::build_router(
+        RouterSecrets {
+            bot_api_key,
+        },
+        RouterState(discord_client.http.clone()),
+    );
 
     let git_client_clone = github_client.clone();
     let http = discord_client.http.clone();
