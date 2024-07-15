@@ -13,8 +13,8 @@ pub async fn handle(ctx: &Context, msg: &Message) -> Result<Option<Message>, ser
     if new_content.is_empty() {
         return Ok(None);
     }
-    
-    match msg.reply(&ctx.http, new_content).await{
+
+    match msg.reply(&ctx.http, new_content).await {
         Ok(message) => Ok(Some(message)),
         Err(err) => Err(err),
     }

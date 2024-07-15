@@ -6,12 +6,14 @@ pub async fn run(
     interaction: &CommandInteraction,
 ) -> Result<String, serenity::Error> {
     if interaction.guild_id.is_none() {
-        return Err(serenity::Error::Other("Ha ocurrido un error al recuparar el guild"));
+        return Err(serenity::Error::Other(
+            "Ha ocurrido un error al recuparar el guild",
+        ));
     }
 
     let guild_id = interaction.guild_id.unwrap();
     let mut count: usize = 0;
-    
+
     if let Ok(member_list) = guild_id.members(&ctx.http, None, None).await {
         for member in member_list.iter() {
             if !member.user.bot {

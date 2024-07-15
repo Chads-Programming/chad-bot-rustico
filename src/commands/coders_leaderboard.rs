@@ -66,7 +66,9 @@ pub async fn run(ctx: &Context) -> Result<String, serenity::Error> {
         .collect::<Vec<String>>()
         .join("\n");
 
-    Ok(format!("\n**Top de contribuidores:**\n\n{leaderboard}\n\n🦊 🚬"))
+    Ok(format!(
+        "\n**Top de contribuidores:**\n\n{leaderboard}\n\n🦊 🚬"
+    ))
 }
 
 pub fn register() -> CreateCommand {

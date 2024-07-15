@@ -1,8 +1,5 @@
 use octorust::{
-    types::{
-        Contributor, MinimalRepository, Order, ReposListOrgSort,
-        ReposListOrgType,
-    },
+    types::{Contributor, MinimalRepository, Order, ReposListOrgSort, ReposListOrgType},
     Client,
 };
 

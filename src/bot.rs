@@ -9,7 +9,7 @@ use serenity::{
 };
 
 use crate::{commands, events, utils};
-use tracing::log::{info, error as log_error};
+use tracing::log::{error as log_error, info};
 
 struct Handler {
     pub guild_id: u64,

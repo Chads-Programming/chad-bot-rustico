@@ -46,14 +46,16 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<(), 
         }
         Err(_) => {
             response
-            .interaction
-            .create_response(
-                ctx,
-                CreateInteractionResponse::Message(CreateInteractionResponseMessage::new().content(
-                    "**No se a podido crear el proyecto**".to_string(),
-                ).ephemeral(true)),
-            )
-            .await?;
+                .interaction
+                .create_response(
+                    ctx,
+                    CreateInteractionResponse::Message(
+                        CreateInteractionResponseMessage::new()
+                            .content("**No se a podido crear el proyecto**".to_string())
+                            .ephemeral(true),
+                    ),
+                )
+                .await?;
         }
     }
 
