@@ -3,6 +3,7 @@ use serenity::all::{
 };
 use serenity::builder::CreateCommand;
 use serenity::utils::CreateQuickModal;
+use tracing::error;
 
 use crate::projects::models::CreateProject;
 use crate::state::SharedState;
@@ -44,7 +45,9 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<(), 
         )
         .await?;
         }
-        Err(_) => {
+        Err(err) => {
+            error!("{err:?}");
+
             response
                 .interaction
                 .create_response(
