@@ -1,23 +1,22 @@
-use std::sync::Arc;
 use axum::middleware::Next;
 use serenity::http::Http;
+use std::sync::Arc;
 
 use axum::extract::{Request, State};
 use axum::http::{HeaderMap, StatusCode};
-use axum::{middleware, Router};
 use axum::response::Response;
-use axum::routing::get;
+use axum::routing::{get, post};
+use axum::{middleware, Router};
 
-use super::health_check;
+use super::{health_check, trending_repos};
 
 #[derive(Clone, Debug)]
 pub struct RouterSecrets {
-    pub bot_api_key: String
+    pub bot_api_key: String,
 }
 
 #[derive(Clone, Debug)]
 pub struct RouterState(pub Arc<Http>);
-
 
 async fn api_key_strategy(
     State(secrets): State<RouterSecrets>,
@@ -43,11 +42,12 @@ async fn api_key_strategy(
 
 pub fn build_router(secrets: RouterSecrets, state: RouterState) -> Router {
     Router::new()
-    .route("/hello-private", get(health_check::hello_private))
-    .layer(middleware::from_fn_with_state(
-        secrets,
-        api_key_strategy,
-    ))
-    .route("/hello-chad", get(health_check::hello_chad))
-    .with_state(state)
+        .route("/hello-private", get(health_check::hello_private))
+        .route(
+            "/publish-trending-repos",
+            post(trending_repos::publish_trending_repos),
+        )
+        .layer(middleware::from_fn_with_state(secrets, api_key_strategy))
+        .route("/hello-chad", get(health_check::hello_chad))
+        .with_state(state)
 }

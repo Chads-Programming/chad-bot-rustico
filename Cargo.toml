@@ -1,7 +1,12 @@
 [package]
 name = "chad-discord-bot"
+description = "Bot de la comunidad de discord"
 version = "0.1.0"
 edition = "2021"
+authors = [
+    "Andrés Velasco <velasco.andrs@gmail.com>",
+    "Mauro Caceres <maurodavidcaceres@gmail.com>",
+]
 
 [dependencies]
 axum = "0.7.4"
@@ -26,5 +31,5 @@ sqlx = { version = "0.7", features = [
     "tls-native-tls",
     "postgres",
     "chrono",
-    "uuid"
+    "uuid",
 ] }

@@ -1,7 +1,6 @@
 mod bot;
 mod commands;
 mod consts;
-mod cronjobs;
 mod db;
 mod errors;
 mod events;
@@ -68,9 +67,7 @@ async fn main(
         .get("GITHUB_TOKEN")
         .expect("github token required");
 
-    let bot_api_key = secret_store
-        .get("API_KEY")
-        .expect("bot api jey required");
+    let bot_api_key = secret_store.get("API_KEY").expect("bot api jey required");
 
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
     let discord_client = bot::setup(token, guild_id).await;
@@ -92,23 +89,9 @@ async fn main(
     }
 
     let router = router::setup::build_router(
-        RouterSecrets {
-            bot_api_key,
-        },
+        RouterSecrets { bot_api_key },
         RouterState(discord_client.http.clone()),
     );
-
-    let git_client_clone = github_client.clone();
-    let http = discord_client.http.clone();
-
-    let trending_job = async move {
-        loop {
-            tokio::time::sleep(std::time::Duration::from_secs(consts::TRENDING_RATE_JOB)).await;
-
-            cronjobs::trends::send_trends(&git_client_clone, &http).await
-        }
-    };
-    tokio::spawn(trending_job);
 
     Ok(CustomService {
         discord_client,
