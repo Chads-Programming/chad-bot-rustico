@@ -53,9 +53,7 @@ impl ProjectRepository {
         if count_result.is_err() {
             println!("Db error: {:?}", count_result.err().unwrap());
 
-            return Err(CustomError::InternalError(String::from(
-                "Error on fetching",
-            )));
+            return Err(CustomError::FetchError(String::from("Error on fetching")));
         }
 
         if fecth_result.is_err() {

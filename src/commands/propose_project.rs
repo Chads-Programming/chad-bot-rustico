@@ -46,7 +46,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<(), 
         .await?;
         }
         Err(err) => {
-            error!("{err:?}");
+            error!("{err}");
 
             response
                 .interaction
