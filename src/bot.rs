@@ -114,6 +114,14 @@ impl EventHandler for Handler {
                     ContentPayload::from_str(content).ephemeral(true)
                 }
                 "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
+                "register_wallet" => {
+                    ContentPayload::from_str(commands::register_wallet::run(&ctx, &command).await)
+                        .ephemeral(true)
+                }
+                "donate_coins" => match commands::donate_coins::run(&ctx, &command).await {
+                    Ok(ok_msg) => ContentPayload::from_str(ok_msg),
+                    Err(err_msg) => ContentPayload::from_str(err_msg).ephemeral(true),
+                },
                 _ => ContentPayload::default(),
             };
 
@@ -139,6 +147,8 @@ impl EventHandler for Handler {
                     commands::propose_project::register(),
                     commands::list_projects::register(),
                     commands::coders_leaderboard::register(),
+                    commands::register_wallet::register(),
+                    commands::donate_coins::register(),
                 ],
             )
             .await

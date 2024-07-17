@@ -8,10 +8,10 @@ pub struct CreateMember {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct DepositAmount {
+pub struct DepositAmountFromDiscord {
     pub from_discord_id: String,
-    pub discord_id: String,
-    pub ammount: String,
+    pub target_discord_id: String,
+    pub amount: f64,
 }
 
 #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
@@ -24,6 +24,6 @@ pub struct Member {
 #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
 pub struct Wallet {
     pub id: Uuid,
-    pub amount: i64,
+    pub amount: f64,
     pub member_id: Uuid,
 }
