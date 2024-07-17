@@ -10,6 +10,7 @@ mod projects;
 mod router;
 mod state;
 mod utils;
+mod wallet;
 
 use std::sync::Arc;
 
