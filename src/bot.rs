@@ -64,7 +64,10 @@ impl Handler {
         defer: bool,
     ) {
         if defer {
-            let builder = CreateInteractionResponseFollowup::new().content(content);
+            let builder = CreateInteractionResponseFollowup::new()
+                .content(content)
+                .ephemeral(ephemeral);
+
             if let Err(why) = command.create_followup(&ctx.http, builder).await {
                 info!("Cannot respond to slash command: {}", why);
             }
@@ -111,7 +114,15 @@ impl EventHandler for Handler {
                     }
 
                     ContentPayload::from_str(commands::register_wallet::run(&ctx, &command).await)
-                        .ephemeral(true)
+                        .defer(true)
+                }
+                "wallet_info" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+                    ContentPayload::from_str(commands::wallet_info::run(&ctx, &command).await)
                         .defer(true)
                 }
                 "donate_coins" => {
@@ -123,9 +134,7 @@ impl EventHandler for Handler {
 
                     match commands::donate_coins::run(&ctx, &command).await {
                         Ok(ok_msg) => ContentPayload::from_str(ok_msg).defer(true),
-                        Err(err_msg) => ContentPayload::from_str(err_msg)
-                            .ephemeral(true)
-                            .defer(true),
+                        Err(err_msg) => ContentPayload::from_str(err_msg).defer(true),
                     }
                 }
                 "say_hello" => {
@@ -191,6 +200,7 @@ impl EventHandler for Handler {
                     commands::coders_leaderboard::register(),
                     commands::register_wallet::register(),
                     commands::donate_coins::register(),
+                    commands::wallet_info::register(),
                 ],
             )
             .await

@@ -86,11 +86,11 @@ impl WalletService {
         Ok(true)
     }
 
-    async fn find_wallet_by_discord_id(&self, discord_id: &str) -> Result<Wallet, CustomError> {
+    pub async fn find_wallet_by_discord_id(&self, discord_id: &str) -> Result<Wallet, CustomError> {
         let conn = &*self.conn;
 
         let result = sqlx::query_as::<_, Wallet>(
-            "Select * from WALLET W INNER JOIN MEMBER M ON M.id = W.member_id where M.discord_id=$1",
+            "Select * from public.WALLET W JOIN public.MEMBER M ON M.id = W.member_id where M.discord_id=$1",
         )
         .bind(discord_id)
         .fetch_one(conn)
