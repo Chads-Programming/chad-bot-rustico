@@ -1,3 +1,4 @@
+use bigdecimal::{BigDecimal, FromPrimitive};
 use sqlx::types::Uuid;
 
 use super::models::{CreateMember, DepositAmountFromDiscord, Wallet};
@@ -20,17 +21,21 @@ impl WalletService {
             .find_wallet_by_discord_id(&create_member.discord_id)
             .await;
 
-        if already_exist_member_result.is_ok() {
-            return Err(CustomError::AlreadyMemberExists(
-                "Member was registerd with same discord account id: {existing_member}".to_string(),
-            ));
+        println!("existente: {already_exist_member_result:?}");
+
+        if let Ok(existing_member) = already_exist_member_result {
+            return Err(CustomError::AlreadyMemberExists(format!(
+                "Member was registerd with same discord account id: {}",
+                existing_member.member_id
+            )));
         }
 
-        let query_result: (Uuid,) = sqlx::query_as("call create_member_with_wallet(?, ?)")
-            .bind(create_member.name.clone())
-            .bind(create_member.discord_id.clone())
-            .fetch_one(conn)
-            .await?;
+        let query_result: (Uuid,) =
+            sqlx::query_as("SELECT * FROM create_member_with_wallet($1, $2)")
+                .bind(create_member.name.clone())
+                .bind(create_member.discord_id.clone())
+                .fetch_one(conn)
+                .await?;
 
         Ok(query_result.0)
     }
@@ -51,7 +56,9 @@ impl WalletService {
             .find_wallet_by_discord_id(&deposit_amount.target_discord_id)
             .await?;
 
-        let has_enougth_amount = from_wallet.amount >= deposit_amount.amount;
+        let deposit_amount_parsed = BigDecimal::from_f64(deposit_amount.amount).unwrap();
+
+        let has_enougth_amount = from_wallet.amount >= deposit_amount_parsed;
 
         if !has_enougth_amount {
             return Err(CustomError::OutOfFunds(
@@ -59,16 +66,16 @@ impl WalletService {
             ));
         }
 
-        let new_target_amount = target_wallet.amount + deposit_amount.amount;
-        let new_from_amount = from_wallet.amount - deposit_amount.amount;
+        let new_target_amount = target_wallet.amount + deposit_amount_parsed.clone();
+        let new_from_amount = from_wallet.amount - deposit_amount_parsed.clone();
 
-        sqlx::query("Update WALLET set amount=? where member_id=?")
+        sqlx::query("Update WALLET set amount=? where member_id=$1")
             .bind(new_target_amount)
             .bind(target_wallet.id)
             .execute(conn)
             .await?;
 
-        sqlx::query("Update WALLET set amount=? where member_id=?")
+        sqlx::query("Update WALLET set amount=? where member_id=$1")
             .bind(new_from_amount)
             .bind(from_wallet.id)
             .execute(conn)
@@ -83,7 +90,7 @@ impl WalletService {
         let conn = &*self.conn;
 
         let result = sqlx::query_as::<_, Wallet>(
-            "Select * from WALLET inner join MEMBERS m where m.discord_id=?",
+            "Select * from WALLET W INNER JOIN MEMBER M ON M.id = W.member_id where M.discord_id=$1",
         )
         .bind(discord_id)
         .fetch_one(conn)

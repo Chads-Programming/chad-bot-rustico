@@ -1,4 +1,4 @@
-use serenity::all::{CommandInteraction, Message};
+use serenity::all::{CommandInteraction, CreateInteractionResponseFollowup, Message};
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -18,6 +18,7 @@ struct Handler {
 struct ContentPayload {
     content: Option<String>,
     ephemeral: bool,
+    defer: bool,
 }
 
 impl ContentPayload {
@@ -25,6 +26,7 @@ impl ContentPayload {
         Self {
             content: Some(content),
             ephemeral: false,
+            defer: false,
         }
     }
 
@@ -34,10 +36,17 @@ impl ContentPayload {
         self
     }
 
+    pub fn defer(mut self, defer: bool) -> Self {
+        self.defer = defer;
+
+        self
+    }
+
     pub fn default() -> Self {
         Self {
             content: Some("Not implemented".to_string()),
             ephemeral: false,
+            defer: false,
         }
     }
 }
@@ -52,7 +61,17 @@ impl Handler {
         command: &CommandInteraction,
         content: String,
         ephemeral: bool,
+        defer: bool,
     ) {
+        if defer {
+            let builder = CreateInteractionResponseFollowup::new().content(content);
+            if let Err(why) = command.create_followup(&ctx.http, builder).await {
+                info!("Cannot respond to slash command: {}", why);
+            }
+
+            return;
+        }
+
         let data = CreateInteractionResponseMessage::new()
             .content(content)
             .ephemeral(ephemeral);
@@ -84,6 +103,31 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
+                "register_wallet" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+
+                    ContentPayload::from_str(commands::register_wallet::run(&ctx, &command).await)
+                        .ephemeral(true)
+                        .defer(true)
+                }
+                "donate_coins" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+
+                    match commands::donate_coins::run(&ctx, &command).await {
+                        Ok(ok_msg) => ContentPayload::from_str(ok_msg).defer(true),
+                        Err(err_msg) => ContentPayload::from_str(err_msg)
+                            .ephemeral(true)
+                            .defer(true),
+                    }
+                }
                 "say_hello" => {
                     ContentPayload::from_str(commands::say_hello::run(&command.data.options()))
                 }
@@ -114,20 +158,18 @@ impl EventHandler for Handler {
                     ContentPayload::from_str(content).ephemeral(true)
                 }
                 "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
-                "register_wallet" => {
-                    ContentPayload::from_str(commands::register_wallet::run(&ctx, &command).await)
-                        .ephemeral(true)
-                }
-                "donate_coins" => match commands::donate_coins::run(&ctx, &command).await {
-                    Ok(ok_msg) => ContentPayload::from_str(ok_msg),
-                    Err(err_msg) => ContentPayload::from_str(err_msg).ephemeral(true),
-                },
                 _ => ContentPayload::default(),
             };
 
             if let Some(content) = content_payload.content {
-                Handler::dispatch_response(&ctx, &command, content, content_payload.ephemeral)
-                    .await;
+                Handler::dispatch_response(
+                    &ctx,
+                    &command,
+                    content,
+                    content_payload.ephemeral,
+                    content_payload.defer,
+                )
+                .await;
             }
         }
     }

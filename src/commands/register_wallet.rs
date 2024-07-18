@@ -15,13 +15,13 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> String {
 
     let register_result = wallet_service
         .register_member(&CreateMember {
-            name: new_member.name,
+            name: new_member.name.clone(),
             discord_id: new_member.id.to_string(),
         })
         .await;
 
-    if let Ok(member_id) = register_result {
-        return  format!("\n**Wallet registrada**\n\nYa puede realizar transacciones\nSu id de miembro es: `${member_id}` \n🦊🚬");
+    if register_result.is_ok() {
+        return format!("`{}` ha registrado su wallet \n\n🦊🚬", new_member.name);
     }
 
     let err = register_result.unwrap_err();
@@ -35,13 +35,18 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> String {
         CustomError::AlreadyMemberExists(err) => {
             error!("{err:?}");
 
-            "Member already exists".to_string()
+            "Ya tienes una wallet 🦊🚬".to_string()
         }
-        _ => "Ha occurrido algun error interno intentalo más tarde".to_string(),
+        CustomError::InternalError(err) => {
+            error!("{err:?}");
+
+            "Ha ocurrido un error interno".to_string()
+        }
+        _ => "Ha occurrido algun error intentalo más tarde".to_string(),
     }
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("register wallet")
+    CreateCommand::new("register_wallet")
         .description("Crear y registrar tu propia wallet (si no tienes una)")
 }

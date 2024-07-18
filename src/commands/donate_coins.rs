@@ -99,15 +99,18 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("donate points")
+    CreateCommand::new("donate_points")
         .description("Donar chad coins a un determinado chad")
         .add_option(
             CreateCommandOption::new(CommandOptionType::User, "user", "El chad a donar")
                 .required(true),
         )
-        .add_option(CreateCommandOption::new(
-            CommandOptionType::Number,
-            "amount",
-            "El monto a depositar (debes tener suficientes chad coins)",
-        ))
+        .add_option(
+            CreateCommandOption::new(
+                CommandOptionType::Number,
+                "amount",
+                "El monto a depositar (debes tener suficientes chad coins)",
+            )
+            .required(true),
+        )
 }

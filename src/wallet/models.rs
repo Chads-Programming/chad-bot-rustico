@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use sqlx::types::Uuid;
+use sqlx::types::{BigDecimal, Uuid};
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct CreateMember {
@@ -24,6 +24,6 @@ pub struct Member {
 #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
 pub struct Wallet {
     pub id: Uuid,
-    pub amount: f64,
+    pub amount: BigDecimal,
     pub member_id: Uuid,
 }

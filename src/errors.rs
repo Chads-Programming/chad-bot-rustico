@@ -4,7 +4,6 @@ use std::fmt;
 pub enum CustomError {
     InternalError(String),
     FetchError(String),
-    CreationError(String),
     OutOfFunds(String),
     BadArguments(String),
     Timeout(String),
@@ -17,7 +16,6 @@ impl fmt::Display for CustomError {
         let printable = match self {
             CustomError::InternalError(err) => err,
             CustomError::FetchError(err) => err,
-            CustomError::CreationError(err) => err,
             CustomError::BadArguments(err) => err,
             CustomError::Timeout(err) => err,
             CustomError::NotFound(err) => err,
@@ -34,7 +32,7 @@ impl From<sqlx::Error> for CustomError {
             sqlx::Error::Configuration(err) => {
                 CustomError::InternalError(format!("[Configuration error] {err:?}"))
             }
-            sqlx::Error::Database(_) => todo!(),
+            sqlx::Error::Database(err) => CustomError::InternalError(format!("[Database] {err:?}")),
             sqlx::Error::Io(err) => CustomError::InternalError(format!("[IO]: {err:?}")),
             sqlx::Error::Tls(err) => CustomError::InternalError(format!("[Tls]: {err:?}")),
             sqlx::Error::Protocol(err) => CustomError::InternalError(format!("[Protocol]: {err}")),

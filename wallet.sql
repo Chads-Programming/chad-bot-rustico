@@ -56,7 +56,7 @@ BEGIN
 
         -- Insertar la billetera con el amount en 0 para el nuevo miembro
         INSERT INTO wallet (member_id, amount)
-        VALUES (new_member_id, 0);
+        VALUES (new_member_id, 100);
 
         -- Confirmar la transacción
         RETURN new_member_id;
