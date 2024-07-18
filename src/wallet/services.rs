@@ -21,8 +21,6 @@ impl WalletService {
             .find_wallet_by_discord_id(&create_member.discord_id)
             .await;
 
-        println!("existente: {already_exist_member_result:?}");
-
         if let Ok(existing_member) = already_exist_member_result {
             return Err(CustomError::AlreadyMemberExists(format!(
                 "Member was registerd with same discord account id: {}",
@@ -69,13 +67,13 @@ impl WalletService {
         let new_target_amount = target_wallet.amount + deposit_amount_parsed.clone();
         let new_from_amount = from_wallet.amount - deposit_amount_parsed.clone();
 
-        sqlx::query("Update WALLET set amount=? where member_id=$1")
+        sqlx::query("Update WALLET set amount=$1 where member_id=$2")
             .bind(new_target_amount)
             .bind(target_wallet.id)
             .execute(conn)
             .await?;
 
-        sqlx::query("Update WALLET set amount=? where member_id=$1")
+        sqlx::query("Update WALLET set amount=$1 where member_id=$2")
             .bind(new_from_amount)
             .bind(from_wallet.id)
             .execute(conn)

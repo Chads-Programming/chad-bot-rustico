@@ -107,7 +107,7 @@ impl EventHandler for Handler {
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
                 "register_wallet" => {
-                    if let Err(why) = command.defer(&ctx.http).await {
+                    if let Err(why) = command.defer_ephemeral(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
 
                         return;
@@ -117,7 +117,7 @@ impl EventHandler for Handler {
                         .defer(true)
                 }
                 "wallet_info" => {
-                    if let Err(why) = command.defer(&ctx.http).await {
+                    if let Err(why) = command.defer_ephemeral(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
 
                         return;
@@ -130,7 +130,7 @@ impl EventHandler for Handler {
                         log_error!("Error deferring interaction: {:?}", why);
 
                         return;
-                    }
+                    };
 
                     match commands::donate_coins::run(&ctx, &command).await {
                         Ok(ok_msg) => ContentPayload::from_str(ok_msg).defer(true),

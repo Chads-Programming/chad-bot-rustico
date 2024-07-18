@@ -67,7 +67,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
 
     if donate_result.is_ok() {
         return Ok(format!(
-            "\n{} a donado `{amount}` chad coins a {} \n\n🦊🚬",
+            "\n**{}** a donado **{amount}** chad coins a **{}** \n\n🦊🚬",
             donator_member_discord.name, target_user.name
         ));
     }
@@ -99,7 +99,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("donate_points")
+    CreateCommand::new("donate_coins")
         .description("Donar chad coins a un determinado chad")
         .add_option(
             CreateCommandOption::new(CommandOptionType::User, "user", "El chad a donar")
