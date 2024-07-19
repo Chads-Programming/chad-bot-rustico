@@ -5,6 +5,7 @@ use serenity::all::{
 use serenity::builder::CreateCommand;
 use tracing::log::error;
 
+use crate::consts;
 use crate::errors::CustomError;
 use crate::state::SharedState;
 use crate::wallet::models::DepositAmountFromDiscord;
@@ -15,7 +16,6 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
     let wallet_service = &state.wallet_service;
 
     let donator_member_discord = interaction.user.clone();
-
     let options = &interaction.data.options().clone();
 
     let query = {
@@ -53,6 +53,10 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
     let target_user = query.0.unwrap();
     let amount = *query.1.unwrap();
 
+    if target_user.id.to_string() == donator_member_discord.id.to_string() {
+        return Err("No te puedes donar a ti mismo 😾".to_string());
+    }
+
     if amount <= 0.0 {
         return Err("El monto debe ser mayor que 0 pibe".to_string());
     }
@@ -66,9 +70,18 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
         .await;
 
     if donate_result.is_ok() {
+        let target_nick = target_user
+            .nick_in(&ctx.http, consts::GUILD_ID)
+            .await
+            .unwrap_or(target_user.name.clone());
+
+        let donator_nick = donator_member_discord
+            .nick_in(&ctx.http, consts::GUILD_ID)
+            .await
+            .unwrap_or(donator_member_discord.name.clone());
+
         return Ok(format!(
-            "\n**{}** a donado **{amount}** chad coins a **{}** \n\n🦊🚬",
-            donator_member_discord.name, target_user.name
+            "\n**{donator_nick}** a donado **{amount}** chad coins a **{target_nick}** \n\n🦊🚬"
         ));
     }
 

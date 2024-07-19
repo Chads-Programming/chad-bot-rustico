@@ -14,12 +14,12 @@ pub struct DepositAmountFromDiscord {
     pub amount: f64,
 }
 
-#[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
-pub struct Member {
-    pub id: Uuid,
-    pub name: String,
-    pub discord_id: String,
-}
+// #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
+// pub struct Member {
+//     pub id: Uuid,
+//     pub name: String,
+//     pub discord_id: String,
+// }
 
 #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
 pub struct Wallet {
