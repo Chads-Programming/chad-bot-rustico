@@ -9,6 +9,10 @@ CREATE TABLE MEMBER (
 );
 
 
+ALTER TABLE MEMBER
+ALTER COLUMN discord_id SET NOT NULL;
+
+
 CREATE TABLE WALLET (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     member_id UUID UNIQUE NOT NULL,
@@ -47,22 +51,21 @@ RETURNS UUID AS $$
 DECLARE
     new_member_id UUID;
 BEGIN
-    -- Iniciar la transacción
     BEGIN
-        -- Insertar el nuevo miembro y obtener su ID
+        -- Insert the new member and return his ID
         INSERT INTO member (name, discord_id)
         VALUES (member_name, member_discord_id)
         RETURNING id INTO new_member_id;
 
-        -- Insertar la billetera con el amount en 0 para el nuevo miembro
+        -- Insert the wallet with the amount in 1000 for the new member
         INSERT INTO wallet (member_id, amount)
         VALUES (new_member_id, 100);
 
-        -- Confirmar la transacción
+        -- Commit the transaction returning the new member ID
         RETURN new_member_id;
     EXCEPTION
         WHEN OTHERS THEN
-            -- Si ocurre un error, revertir la transacción
+            -- Revert the transacion if error exist
             RAISE;
     END;
 END;
