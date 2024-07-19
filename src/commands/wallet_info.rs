@@ -18,7 +18,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> String {
 
     if let Ok(wallet) = wallet_result {
         return format!(
-            "**Estado de su wallet:** \n**Cuenta**: {}\n**Nombre**: {}\n**saldo:** `{} chad coins`\n\n🦊🚬",
+            "**Estado de su wallet:**\n\n**Cuenta**: {}\n**Nombre**: {}\n**saldo:** `{} chad coins`\n\n🦊🚬",
             wallet.member_id, member.name, wallet.amount
         );
     }
