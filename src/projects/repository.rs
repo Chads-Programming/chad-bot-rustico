@@ -25,8 +25,6 @@ impl ProjectRepository {
         .await;
 
         if result.is_err() {
-            println!("Error on create project {:?}", result.err());
-
             return Err(CustomError::InternalError(format!(
                 "Error on create project: {0}",
                 create_project.title

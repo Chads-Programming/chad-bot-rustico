@@ -10,6 +10,7 @@ mod projects;
 mod router;
 mod state;
 mod utils;
+mod wallet;
 
 use std::sync::Arc;
 
@@ -20,6 +21,7 @@ use router::setup::{RouterSecrets, RouterState};
 use serenity::Client as DiscordClient;
 use shuttle_runtime::SecretStore;
 use state::SharedState;
+use wallet::services::WalletService;
 
 impl serenity::prelude::TypeMapKey for SharedState {
     type Value = SharedState;
@@ -83,8 +85,9 @@ async fn main(
         let mut data = discord_client.data.write().await;
 
         data.insert::<SharedState>(SharedState {
-            project_repository: ProjectRepository::new(Arc::new(pool)),
+            project_repository: ProjectRepository::new(Arc::new(pool.clone())),
             github_client: github_client.clone(),
+            wallet_service: WalletService::new(Arc::new(pool.clone())),
         });
     }
 
