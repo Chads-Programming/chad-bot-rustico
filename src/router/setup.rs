@@ -8,7 +8,7 @@ use axum::response::Response;
 use axum::routing::{get, post};
 use axum::{middleware, Router};
 
-use super::{health_check, trending_repos};
+use super::{free_courses, health_check, trending_repos};
 
 #[derive(Clone, Debug)]
 pub struct RouterSecrets {
@@ -46,6 +46,10 @@ pub fn build_router(secrets: RouterSecrets, state: RouterState) -> Router {
         .route(
             "/publish-trending-repos",
             post(trending_repos::publish_trending_repos),
+        )
+        .route(
+            "/publish-free-courses",
+            post(free_courses::publish_free_courses),
         )
         .layer(middleware::from_fn_with_state(secrets, api_key_strategy))
         .route("/hello-chad", get(health_check::hello_chad))
