@@ -1,4 +1,6 @@
-use serenity::all::{CommandInteraction, CreateInteractionResponseFollowup, Message};
+use serenity::all::{
+    CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Message,
+};
 use serenity::async_trait;
 use serenity::{
     all::{
@@ -19,6 +21,7 @@ struct ContentPayload {
     content: Option<String>,
     ephemeral: bool,
     defer: bool,
+    allowed_mentions: bool,
 }
 
 impl ContentPayload {
@@ -27,6 +30,7 @@ impl ContentPayload {
             content: Some(content),
             ephemeral: false,
             defer: false,
+            allowed_mentions: true,
         }
     }
 
@@ -42,11 +46,18 @@ impl ContentPayload {
         self
     }
 
+    pub fn allowed_mentions(mut self, allowed_mentions: bool) -> Self {
+        self.allowed_mentions = allowed_mentions;
+
+        self
+    }
+
     pub fn default() -> Self {
         Self {
             content: Some("Not implemented".to_string()),
             ephemeral: false,
             defer: false,
+            allowed_mentions: true,
         }
     }
 }
@@ -62,12 +73,15 @@ impl Handler {
         content: String,
         ephemeral: bool,
         defer: bool,
+        allowed_mentions: bool,
     ) {
         if defer {
-            let builder = CreateInteractionResponseFollowup::new()
+            let mut builder = CreateInteractionResponseFollowup::new()
                 .content(content)
                 .ephemeral(ephemeral);
-
+            if !allowed_mentions {
+                builder = builder.allowed_mentions(CreateAllowedMentions::new().empty_users());
+            }
             if let Err(why) = command.create_followup(&ctx.http, builder).await {
                 info!("Cannot respond to slash command: {}", why);
             }
@@ -75,10 +89,13 @@ impl Handler {
             return;
         }
 
-        let data = CreateInteractionResponseMessage::new()
+        let mut data = CreateInteractionResponseMessage::new()
             .content(content)
             .ephemeral(ephemeral);
 
+        if !allowed_mentions {
+            data = data.allowed_mentions(CreateAllowedMentions::new().empty_users());
+        }
         let builder: CreateInteractionResponse = CreateInteractionResponse::Message(data);
 
         if let Err(why) = command.create_response(&ctx.http, builder).await {
@@ -167,6 +184,16 @@ impl EventHandler for Handler {
                     ContentPayload::from_str(content).ephemeral(true)
                 }
                 "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
+                "wallet_leaderboard" => {
+                    if let Err(why) = command.defer_ephemeral(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+                    ContentPayload::from_str(commands::wallet_leaderboard::run(&ctx).await)
+                        .defer(true)
+                        .allowed_mentions(false)
+                }
                 _ => ContentPayload::default(),
             };
 
@@ -177,6 +204,7 @@ impl EventHandler for Handler {
                     content,
                     content_payload.ephemeral,
                     content_payload.defer,
+                    content_payload.allowed_mentions,
                 )
                 .await;
             }
@@ -201,6 +229,7 @@ impl EventHandler for Handler {
                     commands::register_wallet::register(),
                     commands::donate_coins::register(),
                     commands::wallet_info::register(),
+                    commands::wallet_leaderboard::register(),
                 ],
             )
             .await

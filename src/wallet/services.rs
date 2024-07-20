@@ -1,8 +1,8 @@
-use bigdecimal::{BigDecimal, FromPrimitive};
-use sqlx::types::Uuid;
-
 use super::models::{CreateMember, DepositAmountFromDiscord, Wallet};
 use crate::{db::ConnectionPool, errors::CustomError};
+use bigdecimal::{BigDecimal, FromPrimitive};
+use sqlx::types::Uuid;
+use sqlx::{self, postgres::PgRow, Row};
 use std::sync::Arc;
 
 pub struct WalletService {
@@ -96,4 +96,33 @@ impl WalletService {
 
         Ok(result)
     }
+
+    pub async fn find_members_sort_by_wallet_amount(
+        &self,
+    ) -> Result<Vec<MemberWithWallet>, CustomError> {
+        let conn = &*self.conn;
+        let result = sqlx::query(
+            "Select * from public.WALLET W JOIN public.MEMBER M ON M.id = W.member_id ORDER BY W.amount DESC LIMIT 10",
+        )
+        .map(|row: PgRow| {
+            let wallet = Wallet {
+                    amount: row.get("amount"),
+                    id: row.get("id"),
+                    member_id: row.get("member_id"),
+                };
+            MemberWithWallet{
+                discord_id: row.get("discord_id"),
+                wallet
+            }
+        })
+        .fetch_all(conn)
+        .await?;
+
+        Ok(result)
+    }
+}
+
+pub struct MemberWithWallet {
+    pub wallet: Wallet,
+    pub discord_id: String,
 }
