@@ -1,4 +1,8 @@
-use serenity::all::{ChannelId, Http, ResolvedOption, ResolvedValue, User};
+use std::path::Path;
+
+use serenity::all::{
+    ChannelId, CreateAttachment, CreateMessage, Http, ResolvedOption, ResolvedValue, User,
+};
 use tracing::{error, info};
 
 #[allow(suspicious_double_ref_op)]
@@ -28,6 +32,29 @@ pub async fn send_message_to_channel(
     }
 
     info!("Message was sending to channel");
+
+    Ok(())
+}
+
+pub async fn send_file_message_to_channel(
+    http: &Http,
+    channel_id: u64,
+    message: &str,
+    file_path: &Path,
+) -> Result<(), serenity::Error> {
+    let channel = ChannelId::new(channel_id);
+
+    let attachment = CreateAttachment::path(file_path).await?;
+    let files: Vec<CreateAttachment> = vec![attachment];
+    let message = CreateMessage::new().content(message);
+
+    if let Err(err) = channel.send_files(http, files, message).await {
+        error!("Error on send message file: {err}");
+
+        return Err(err);
+    }
+
+    info!("Message was sending to channel file");
 
     Ok(())
 }
