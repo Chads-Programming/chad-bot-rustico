@@ -16,7 +16,7 @@ pub async fn run(ctx: &Context) -> String {
                     format!(
                         "**{}** *<@{}>* `[{}]`\n",
                         index + 1,
-                        member.id,
+                        member.discord_id,
                         member.amount
                     )
                 })

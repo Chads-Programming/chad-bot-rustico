@@ -102,7 +102,7 @@ impl WalletService {
     ) -> Result<Vec<MinimalMemberWallet>, CustomError> {
         let conn = &*self.conn;
         let result = sqlx::query_as::<_, MinimalMemberWallet>(
-            "Select M.id, W.id as wallet_id, M.name, amount from public.WALLET W INNER JOIN public.MEMBER M ON M.id = W.member_id ORDER BY W.amount DESC LIMIT 10",
+            "Select M.id, W.id as wallet_id, M.name, amount, M.discord_id from public.WALLET W INNER JOIN public.MEMBER M ON M.id = W.member_id ORDER BY W.amount DESC LIMIT 10",
         )
         .fetch_all(conn)
         .await?;
