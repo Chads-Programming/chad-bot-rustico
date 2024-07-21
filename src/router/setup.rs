@@ -5,10 +5,10 @@ use std::sync::Arc;
 use axum::extract::{Request, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
-use axum::routing::{get, post};
+use axum::routing::get;
 use axum::{middleware, Router};
 
-use super::{free_courses, health_check, trending_repos};
+use super::{health_check, reminders, scraping};
 
 #[derive(Clone, Debug)]
 pub struct RouterSecrets {
@@ -43,14 +43,8 @@ async fn api_key_strategy(
 pub fn build_router(secrets: RouterSecrets, state: RouterState) -> Router {
     Router::new()
         .route("/hello-private", get(health_check::hello_private))
-        .route(
-            "/publish-trending-repos",
-            post(trending_repos::publish_trending_repos),
-        )
-        .route(
-            "/publish-free-courses",
-            post(free_courses::publish_free_courses),
-        )
+        .nest("/scraping", scraping::build_router())
+        .nest("/reminder", reminders::build_router())
         .layer(middleware::from_fn_with_state(secrets, api_key_strategy))
         .route("/hello-chad", get(health_check::hello_chad))
         .with_state(state)
