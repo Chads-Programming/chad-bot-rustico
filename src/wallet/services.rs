@@ -1,8 +1,8 @@
+use super::models::{CreateMember, DepositAmountFromDiscord, MinimalMemberWallet, Wallet};
+use crate::{db::ConnectionPool, errors::CustomError};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use sqlx::types::Uuid;
-
-use super::models::{CreateMember, DepositAmountFromDiscord, Wallet};
-use crate::{db::ConnectionPool, errors::CustomError};
+use sqlx::{self};
 use std::sync::Arc;
 
 pub struct WalletService {
@@ -92,6 +92,19 @@ impl WalletService {
         )
         .bind(discord_id)
         .fetch_one(conn)
+        .await?;
+
+        Ok(result)
+    }
+
+    pub async fn find_members_sort_by_wallet_amount(
+        &self,
+    ) -> Result<Vec<MinimalMemberWallet>, CustomError> {
+        let conn = &*self.conn;
+        let result = sqlx::query_as::<_, MinimalMemberWallet>(
+            "Select M.id, W.id as wallet_id, M.name, amount from public.WALLET W INNER JOIN public.MEMBER M ON M.id = W.member_id ORDER BY W.amount DESC LIMIT 10",
+        )
+        .fetch_all(conn)
         .await?;
 
         Ok(result)

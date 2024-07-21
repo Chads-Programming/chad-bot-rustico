@@ -69,7 +69,7 @@ async fn main(
         .get("GITHUB_TOKEN")
         .expect("github token required");
 
-    let bot_api_key = secret_store.get("API_KEY").expect("bot api jey required");
+    let bot_api_key = secret_store.get("API_KEY").expect("bot api key required");
 
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
     let discord_client = bot::setup(token, guild_id).await;
