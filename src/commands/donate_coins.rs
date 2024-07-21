@@ -104,7 +104,7 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
         CustomError::NotFound(err) => {
             error!("{err:?}");
 
-            Err("Parece que uno de los participantes en esta transacción no se encuentran registrados"
+            Err("Parece que uno de los participantes en esta transacción no se encuentra registrados"
                 .to_string())
         }
         _ => Err("Ha occurrido algun error interno intentalo más tarde".to_string()),

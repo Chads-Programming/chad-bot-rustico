@@ -46,12 +46,6 @@ impl ContentPayload {
         self
     }
 
-    pub fn allowed_mentions(mut self, allowed_mentions: bool) -> Self {
-        self.allowed_mentions = allowed_mentions;
-
-        self
-    }
-
     pub fn default() -> Self {
         Self {
             content: Some("Not implemented".to_string()),
@@ -89,13 +83,10 @@ impl Handler {
             return;
         }
 
-        let mut data = CreateInteractionResponseMessage::new()
+        let data = CreateInteractionResponseMessage::new()
             .content(content)
             .ephemeral(ephemeral);
 
-        if !allowed_mentions {
-            data = data.allowed_mentions(CreateAllowedMentions::new().empty_users());
-        }
         let builder: CreateInteractionResponse = CreateInteractionResponse::Message(data);
 
         if let Err(why) = command.create_response(&ctx.http, builder).await {
@@ -185,14 +176,13 @@ impl EventHandler for Handler {
                 }
                 "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
                 "wallet_leaderboard" => {
-                    if let Err(why) = command.defer_ephemeral(&ctx.http).await {
+                    if let Err(why) = command.defer(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
 
                         return;
                     }
                     ContentPayload::from_str(commands::wallet_leaderboard::run(&ctx).await)
                         .defer(true)
-                        .allowed_mentions(false)
                 }
                 _ => ContentPayload::default(),
             };
