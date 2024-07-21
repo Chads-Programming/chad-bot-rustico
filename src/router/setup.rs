@@ -8,7 +8,9 @@ use axum::response::Response;
 use axum::routing::get;
 use axum::{middleware, Router};
 
-use super::{health_check, reminders, scraping};
+use crate::wallet::services::WalletService;
+
+use super::{health_check, reminders, scraping, wallet};
 
 #[derive(Clone, Debug)]
 pub struct RouterSecrets {
@@ -16,7 +18,7 @@ pub struct RouterSecrets {
 }
 
 #[derive(Clone, Debug)]
-pub struct RouterState(pub Arc<Http>);
+pub struct RouterState(pub Arc<Http>, pub WalletService);
 
 async fn api_key_strategy(
     State(secrets): State<RouterSecrets>,
@@ -45,6 +47,7 @@ pub fn build_router(secrets: RouterSecrets, state: RouterState) -> Router {
         .route("/hello-private", get(health_check::hello_private))
         .nest("/scraping", scraping::build_router())
         .nest("/reminder", reminders::build_router())
+        .nest("/wallet", wallet::build_router())
         .layer(middleware::from_fn_with_state(secrets, api_key_strategy))
         .route("/hello-chad", get(health_check::hello_chad))
         .with_state(state)
