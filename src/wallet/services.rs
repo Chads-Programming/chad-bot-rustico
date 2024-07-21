@@ -5,6 +5,7 @@ use sqlx::types::Uuid;
 use sqlx::{self};
 use std::sync::Arc;
 
+#[derive(Debug, Clone)]
 pub struct WalletService {
     conn: Arc<ConnectionPool>,
 }
@@ -108,5 +109,16 @@ impl WalletService {
         .await?;
 
         Ok(result)
+    }
+
+    pub async fn refill_wallet_members(&self, refill_amount: i64) -> Result<(), CustomError> {
+        let conn = &*self.conn;
+
+        sqlx::query("Update public.WALLET set amount=amount+$1")
+            .bind(refill_amount)
+            .execute(conn)
+            .await?;
+
+        Ok(())
     }
 }

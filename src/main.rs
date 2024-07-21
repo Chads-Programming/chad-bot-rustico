@@ -81,19 +81,21 @@ async fn main(
     )
     .unwrap();
 
+    let wallet_service = WalletService::new(Arc::new(pool.clone()));
+
     {
         let mut data = discord_client.data.write().await;
 
         data.insert::<SharedState>(SharedState {
             project_repository: ProjectRepository::new(Arc::new(pool.clone())),
             github_client: github_client.clone(),
-            wallet_service: WalletService::new(Arc::new(pool.clone())),
+            wallet_service: wallet_service.clone(),
         });
     }
 
     let router = router::setup::build_router(
         RouterSecrets { bot_api_key },
-        RouterState(discord_client.http.clone()),
+        RouterState(discord_client.http.clone(), wallet_service.clone()),
     );
 
     Ok(CustomService {

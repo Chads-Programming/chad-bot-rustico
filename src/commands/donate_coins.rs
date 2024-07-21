@@ -5,7 +5,6 @@ use serenity::all::{
 use serenity::builder::CreateCommand;
 use tracing::log::error;
 
-use crate::consts;
 use crate::errors::CustomError;
 use crate::state::SharedState;
 use crate::wallet::models::DepositAmountFromDiscord;
