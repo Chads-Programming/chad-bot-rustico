@@ -17,7 +17,9 @@ pub struct DepositAmountFromDiscord {
 #[derive(Deserialize, sqlx::FromRow, Debug, Clone)]
 pub struct MinimalMemberWallet {
     pub id: Uuid,
+    #[allow(dead_code)]
     pub name: String,
+    #[allow(dead_code)]
     pub wallet_id: Uuid,
     pub amount: BigDecimal,
 }
@@ -28,8 +30,3 @@ pub struct Wallet {
     pub amount: BigDecimal,
     pub member_id: Uuid,
 }
-
-// pub struct MemberWithWallet {
-//     pub wallet: Wallet,
-//     pub discord_id: String,
-// }
