@@ -27,7 +27,7 @@ async fn reminder_good_night(State(ctx): State<RouterState>) -> impl IntoRespons
 
     info!("Message was sending to channel [GENERAL]");
 
-    (StatusCode::OK, "Published trending repos").into_response()
+    (StatusCode::OK, "Published \"good night\" reminder repos").into_response()
 }
 
 async fn reminder_good_morning(State(ctx): State<RouterState>) -> impl IntoResponse {
@@ -47,7 +47,7 @@ async fn reminder_good_morning(State(ctx): State<RouterState>) -> impl IntoRespo
 
     info!("Message was sending to channel [GENERAL]");
 
-    (StatusCode::OK, "Published trending repos").into_response()
+    (StatusCode::OK, "Published \"good morning\" reminder").into_response()
 }
 
 pub fn build_router() -> Router<RouterState> {

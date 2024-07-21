@@ -70,18 +70,9 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
         .await;
 
     if donate_result.is_ok() {
-        let target_nick = target_user
-            .nick_in(&ctx.http, consts::GUILD_ID)
-            .await
-            .unwrap_or(target_user.name.clone());
-
-        let donator_nick = donator_member_discord
-            .nick_in(&ctx.http, consts::GUILD_ID)
-            .await
-            .unwrap_or(donator_member_discord.name.clone());
-
         return Ok(format!(
-            "\n**{donator_nick}** a donado **{amount}** chad coins a **{target_nick}** \n\n🦊🚬"
+            "\n*<@{}>* a dado **{amount}** chad coins a *<@{}>* \n\n🦊🚬",
+            donator_member_discord.id, target_user.id,
         ));
     }
 
