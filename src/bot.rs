@@ -1,3 +1,4 @@
+use crate::{commands, consts, events, utils};
 use serenity::all::{
     CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Message,
 };
@@ -9,8 +10,6 @@ use serenity::{
     },
     Client,
 };
-
-use crate::{commands, events, utils};
 use tracing::log::{error as log_error, info};
 
 struct Handler {
@@ -107,9 +106,12 @@ impl From<Result<String, serenity::Error>> for ContentPayload {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        if let Err(err) = events::twitter_links_message::handle(&ctx, &msg).await {
-            log_error!("Error on intercept message: {:?}", err)
+        if consts::BOTS_IDS.contains(&msg.author.id.into()) {
+            return;
         }
+
+        events::english_day::handle(&ctx, &msg).await;
+        events::twitter_links_message::handle(&ctx, &msg).await;
     }
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {

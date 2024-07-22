@@ -6,6 +6,7 @@ mod errors;
 mod events;
 mod gifs;
 mod github;
+mod helpers;
 mod projects;
 mod router;
 mod state;
