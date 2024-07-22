@@ -7,3 +7,6 @@ pub const GREETING_NIGHT_IMAGE: &str = "./images/ground_fox.png";
 pub const GREETING_DAY_IMAGE: &str = "./images/chad_morning.png";
 pub const CAT_IMAGE: &str = "./images/cat_cat.png";
 pub const WALLET_REFILL_AMOUNT: i64 = 100;
+pub const DUDE_EMOJI: &str = "<:tonohmm:1257619715430420540>";
+pub const CHAD_BOT_ID: i64 = 2;
+pub const BOTS_IDS: [i64; 2] = [CHAD_BOT_ID, 949731498808979557];

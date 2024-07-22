@@ -1,23 +1,28 @@
 use serenity::all::Context;
 use serenity::all::Message;
+use tracing::error;
+use tracing::info;
 
 use crate::events::utils::is_own_message;
 
-pub async fn handle(ctx: &Context, msg: &Message) -> Result<Option<Message>, serenity::Error> {
+pub async fn handle(ctx: &Context, msg: &Message) {
     if is_own_message(ctx, msg) {
-        return Ok(None);
+        return;
     }
 
     let new_content: String = get_new_messages(msg);
 
     if new_content.is_empty() {
-        return Ok(None);
+        return;
     }
 
-    match msg.reply(&ctx.http, new_content).await {
-        Ok(message) => Ok(Some(message)),
-        Err(err) => Err(err),
+    if let Err(err) = msg.reply(&ctx.http, new_content).await {
+        error!("Error on manage twitter_links_message: {err:?}");
+
+        return;
     }
+
+    info!("Twitter link message replied");
 }
 
 fn get_new_messages(msg: &Message) -> String {
