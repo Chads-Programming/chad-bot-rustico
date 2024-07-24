@@ -38,7 +38,19 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
             None
         };
 
-        (option_user, option_amount)
+        let option_note = if let Some(ResolvedOption {
+            value: ResolvedValue::String(note),
+            ..
+        }) = options.get(2)
+        {
+            Some(note)
+        } else {
+            None
+        };
+
+        println!("{option_note:?}");
+
+        (option_user, option_amount, option_note)
     };
 
     if query.0.is_none() {
@@ -69,10 +81,16 @@ pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> Result<Stri
         .await;
 
     if donate_result.is_ok() {
-        return Ok(format!(
-            "\n*<@{}>* a dado **{amount}** chad coins a *<@{}>* \n\n🦊🚬",
-            donator_member_discord.id, target_user.id,
-        ));
+        let mut message = format!(
+            "\n*<@{}>* a dado **{amount}** chad coins a *<@{}>*",
+            donator_member_discord.id, target_user.id
+        );
+
+        if let Some(note) = query.2 {
+            message = format!("{message} por: `{note}`")
+        }
+
+        return Ok(format!("{message} \n\n🦊🚬"));
     }
 
     let err = donate_result.unwrap_err();
@@ -115,5 +133,13 @@ pub fn register() -> CreateCommand {
                 "El monto a depositar (debes tener suficientes chad coins)",
             )
             .required(true),
+        )
+        .add_option(
+            CreateCommandOption::new(
+                CommandOptionType::String,
+                "note",
+                "Una nota/razón sobre la transacción",
+            )
+            .required(false),
         )
 }
