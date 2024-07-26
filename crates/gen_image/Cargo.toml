@@ -1,0 +1,12 @@
+[package]
+name = "gen_image"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = { version = "0.25.2", default-features = false, features = [
+    "png",
+    "webp",
+] }
+ab_glyph = "0.2.24"
+imageproc = { version = "0.24.0", default-features = false }
