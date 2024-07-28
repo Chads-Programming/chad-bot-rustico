@@ -1,6 +1,8 @@
+use std::path::Path;
+
 use crate::{commands, consts, events, utils};
 use serenity::all::{
-    CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Message,
+    CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Member, Message,
 };
 use serenity::async_trait;
 use serenity::{
@@ -113,6 +115,43 @@ impl EventHandler for Handler {
         events::english_day::handle(&ctx, &msg).await;
         events::twitter_links_message::handle(&ctx, &msg).await;
     }
+
+    async fn guild_member_addition(&self, ctx: Context, member: Member) {
+        let response = reqwest::get(member.face()).await.unwrap();
+        let avatar = response.bytes().await.unwrap();
+        let guild_id = GuildId::new(self.guild_id);
+
+        let position_number = guild_id
+            .to_guild_cached(&ctx)
+            .map(|g| g.member_count as usize)
+            .unwrap_or(1);
+
+        let output_path = format!("/tmp/{}_welcome.png", member.user.name);
+
+        if let Err(err) = gen_image::generate(
+            &avatar,
+            "./assets/banner.png",
+            member.distinct(),
+            position_number,
+            &output_path,
+            include_bytes!("../assets/fonts/Roboto-Bold.ttf"),
+            include_bytes!("../assets/fonts/Roboto-Regular.ttf"),
+        ) {
+            log_error!("{err:?}");
+        }
+
+        if let Err(err) = utils::send_file_message_to_channel(
+            &ctx.http,
+            consts::WELCOME_CHANNEL_ID,
+            "",
+            Path::new(&output_path),
+        )
+        .await
+        {
+            log_error!("{err:?}");
+        }
+    }
+
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
             let content_payload = match command.data.name.as_str() {
@@ -235,7 +274,8 @@ pub async fn setup(token: String, guild_id: u64) -> Client {
     let intents = GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::GUILDS
         | GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
+        | GatewayIntents::MESSAGE_CONTENT
+        | GatewayIntents::GUILD_MEMBERS;
     // Build our client.
     Client::builder(token, intents)
         .event_handler(Handler::new(guild_id))
