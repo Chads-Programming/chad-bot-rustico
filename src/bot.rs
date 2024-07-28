@@ -108,8 +108,6 @@ impl From<Result<String, serenity::Error>> for ContentPayload {
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        info!("Message {:?}", msg.author.id);
-
         if consts::BOTS_IDS.contains(&msg.author.id.into()) {
             return;
         }
@@ -130,9 +128,15 @@ impl EventHandler for Handler {
 
         let output_path = format!("/tmp/{}_welcome.png", member.user.name);
 
-        if let Err(err) =
-            gen_image::generate(&avatar, member.distinct(), position_number, &output_path)
-        {
+        if let Err(err) = gen_image::generate(
+            &avatar,
+            "./assets/welcome.png",
+            member.distinct(),
+            position_number,
+            &output_path,
+            include_bytes!("../assets/fonts/WorkSans-Bold.ttf"),
+            include_bytes!("../assets/fonts/WorkSans-Regular.ttf"),
+        ) {
             log_error!("{err:?}");
         }
 

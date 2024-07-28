@@ -1,0 +1,11 @@
+/Users/andresvelasco/Documents/proyectos/chad/chad-discord-bot/crates/gen_image/target/debug/deps/libconv-c55fcbef32d4615c.rmeta: /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/lib.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/macros.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/errors.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/misc.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/impls.rs
+
+/Users/andresvelasco/Documents/proyectos/chad/chad-discord-bot/crates/gen_image/target/debug/deps/libconv-c55fcbef32d4615c.rlib: /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/lib.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/macros.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/errors.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/misc.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/impls.rs
+
+/Users/andresvelasco/Documents/proyectos/chad/chad-discord-bot/crates/gen_image/target/debug/deps/conv-c55fcbef32d4615c.d: /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/lib.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/macros.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/errors.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/misc.rs /Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/impls.rs
+
+/Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/lib.rs:
+/Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/macros.rs:
+/Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/errors.rs:
+/Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/misc.rs:
+/Users/andresvelasco/.cargo/registry/src/index.crates.io-6f17d22bba15001f/conv-0.3.3/src/impls.rs:

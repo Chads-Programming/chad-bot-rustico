@@ -1,3 +1,5 @@
+workspace = { members = ["crates/gen_image"] }
+
 [package]
 name = "chad-discord-bot"
 description = "Bot de la comunidad de discord"
