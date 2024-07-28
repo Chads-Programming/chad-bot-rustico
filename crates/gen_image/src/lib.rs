@@ -1,7 +1,7 @@
 use ab_glyph::{FontRef, InvalidFont, PxScale};
 use image::{GenericImage, GenericImageView, ImageBuffer, ImageError, Pixel, Rgba};
 
-const FONT_SIZE: PxScale = PxScale { x: 36., y: 36. };
+const FONT_SIZE: PxScale = PxScale { x: 48., y: 48. };
 
 #[derive(Debug, Clone)]
 enum Colors {
@@ -55,22 +55,22 @@ pub fn generate(
 
     imageproc::drawing::draw_text_mut(
         &mut background,
-        Rgba([255, 255, 255, 255]),
+        Colors::White.clone().into(),
         ((w / 2) - (t1_x / 2)) as i32,
-        429,
+        369,
         FONT_SIZE,
         &bold_font,
         &w_msg,
     );
 
-    let n_msg = format!("Eres el chad: {}", position_number);
+    let n_msg = format!("Eres el chad: #{}", position_number);
     let (t2_x, _t2_y) = imageproc::drawing::text_size(FONT_SIZE, &regular_font, &n_msg);
 
     imageproc::drawing::draw_text_mut(
         &mut background,
-        Rgba([255, 255, 255, 255]),
+        Colors::White.clone().into(),
         ((w / 2) - (t2_x / 2)) as i32,
-        488,
+        418,
         FONT_SIZE,
         &regular_font,
         &n_msg,

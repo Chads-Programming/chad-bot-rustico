@@ -44,7 +44,7 @@ pub fn main() {
         &background,
         "Peronist man".to_string(),
         position_number,
-        "test_welcome.png",
+        "welcome.png",
         &font_regular,
         &font_bold,
     ) {

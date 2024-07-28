@@ -130,12 +130,12 @@ impl EventHandler for Handler {
 
         if let Err(err) = gen_image::generate(
             &avatar,
-            "./assets/welcome.png",
+            "./assets/banner.png",
             member.distinct(),
             position_number,
             &output_path,
-            include_bytes!("../assets/fonts/WorkSans-Bold.ttf"),
-            include_bytes!("../assets/fonts/WorkSans-Regular.ttf"),
+            include_bytes!("../assets/fonts/Roboto-Bold.ttf"),
+            include_bytes!("../assets/fonts/Roboto-Regular.ttf"),
         ) {
             log_error!("{err:?}");
         }
