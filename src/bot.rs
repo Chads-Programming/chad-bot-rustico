@@ -143,7 +143,7 @@ impl EventHandler for Handler {
         if let Err(err) = utils::send_file_message_to_channel(
             &ctx.http,
             consts::WELCOME_CHANNEL_ID,
-            "Bienvenido a este humilde servidor: <@{}>",
+            &format!("Bienvenido a este humilde servidor: <@{}>", member.user.id),
             Path::new(&output_path),
         )
         .await
