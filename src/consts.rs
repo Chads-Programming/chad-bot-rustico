@@ -16,5 +16,5 @@ pub const BOTS_IDS: [i64; 4] = [
 ];
 pub const CAT_CHAD_STICKER: u64 = 1265339053356613663;
 pub const BASED_CAT_STICKER: u64 = 1267682131534938234;
-pub const ENGLISH_DAYS: [chrono::Weekday; 2] = [chrono::Weekday::Tue, chrono::Weekday::Fri];
+pub const ENGLISH_DAYS: [chrono::Weekday; 2] = [chrono::Weekday::Wed, chrono::Weekday::Fri];
 pub const ENGLISH_DAY_WHITELIST: [u64; 1] = [1072587560116817930];
