@@ -63,9 +63,13 @@ async fn publish_free_courses(
             format!("_\n\n{msg}")
         };
 
-        let send_response =
-            utils::send_message_to_channel(&ctx.0, consts::COURSES_CHANNEL_ID, formated_message)
-                .await;
+        let send_response = utils::send_message_to_channel(
+            &ctx.0,
+            consts::COURSES_CHANNEL_ID,
+            formated_message,
+            None,
+        )
+        .await;
 
         if send_response.is_err() {
             errors += 1;

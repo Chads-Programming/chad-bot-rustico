@@ -4,8 +4,6 @@ pub const COMMUNICATIONS_CHANNEL_ID: u64 = 1260104740746825768;
 pub const GENERAL_CHANNEL_ID: u64 = 1242262189985763471;
 pub const COURSES_CHANNEL_ID: u64 = 1263988904919433247;
 pub const WELCOME_CHANNEL_ID: u64 = 1244512390091898931;
-pub const GREETING_NIGHT_IMAGE: &str = "./assets/ground_fox.png";
-pub const GREETING_DAY_IMAGE: &str = "./assets/chad_morning.png";
 pub const CAT_IMAGE: &str = "./assets/cat_cat.png";
 pub const WALLET_REFILL_AMOUNT: i64 = 100;
 pub const DUDE_EMOJI: &str = "<:tonohmm:1257619715430420540>";
@@ -16,3 +14,7 @@ pub const BOTS_IDS: [i64; 4] = [
     276060004262477825,
     1265501760013729923,
 ];
+pub const CAT_CHAD_STICKER: u64 = 1265339053356613663;
+pub const BASED_CAT_STICKER: u64 = 1267682131534938234;
+pub const ENGLISH_DAYS: [chrono::Weekday; 2] = [chrono::Weekday::Tue, chrono::Weekday::Fri];
+pub const ENGLISH_DAY_WHITELIST: [u64; 1] = [1072587560116817930];

@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use super::setup::RouterState;
 use crate::consts;
 use crate::utils;
@@ -11,11 +9,11 @@ use axum::{extract::State, response::IntoResponse};
 use tracing::{error, info};
 
 async fn reminder_good_night(State(ctx): State<RouterState>) -> impl IntoResponse {
-    let response = utils::send_file_message_to_channel(
+    let response = utils::send_message_to_channel(
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
-        "Sigan codeando mis chads",
-        Path::new(consts::GREETING_NIGHT_IMAGE),
+        "Buenas noches gente".to_string(),
+        Some(consts::CAT_CHAD_STICKER),
     )
     .await;
 
@@ -31,11 +29,11 @@ async fn reminder_good_night(State(ctx): State<RouterState>) -> impl IntoRespons
 }
 
 async fn reminder_good_morning(State(ctx): State<RouterState>) -> impl IntoResponse {
-    let response = utils::send_file_message_to_channel(
+    let response = utils::send_message_to_channel(
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
-        "Hora de programar mis chads",
-        Path::new(consts::GREETING_DAY_IMAGE),
+        "Buenos días gente".to_string(),
+        Some(consts::BASED_CAT_STICKER),
     )
     .await;
 
@@ -59,6 +57,7 @@ async fn reminder_english_day(State(ctx): State<RouterState>) -> impl IntoRespon
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
         "@here\n Today is the english day".to_string(),
+        Some(consts::BASED_CAT_STICKER),
     )
     .await;
 
