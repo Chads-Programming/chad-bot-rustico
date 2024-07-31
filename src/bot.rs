@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use crate::{commands, consts, events, utils};
+use chrono::Utc;
 use serenity::all::{
     CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Member, Message,
 };
@@ -128,9 +129,25 @@ impl EventHandler for Handler {
 
         let output_path = format!("/tmp/{}_welcome.png", member.user.name);
 
+        let dt = Utc::now();
+        let timestamp: String = dt.timestamp().to_string();
+
+        let digits: Vec<_> = timestamp
+            .chars()
+            .map(|d| d.to_digit(10).unwrap_or(5))
+            .collect();
+
+        let random_number = *digits.last().unwrap_or(&5);
+
+        let banner = if random_number > 3 {
+            "./assets/banner.png"
+        } else {
+            "./assets/pride_banner.png"
+        };
+
         if let Err(err) = gen_image::generate(
             &avatar,
-            "./assets/banner.png",
+            banner,
             member.distinct(),
             position_number,
             &output_path,
