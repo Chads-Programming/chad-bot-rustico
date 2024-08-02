@@ -31,8 +31,9 @@ pub async fn handle(ctx: &Context, msg: &Message) {
 
     if msg.channel_id == consts::ENGLISH_CHANNEL_ID {
         let message = format!(
-            "Today is the english day, please try to send your messages in english {}",
-            consts::DUDE_EMOJI
+            "Today is the english day, please try to send your messages in english <:{}:{}>",
+            consts::DUDE_EMOJI.1,
+            consts::DUDE_EMOJI.0,
         );
 
         if let Err(err) = msg.reply(&ctx.http, message).await {
@@ -51,8 +52,8 @@ pub async fn handle(ctx: &Context, msg: &Message) {
             &ctx.http,
             ReactionType::Custom {
                 animated: false,
-                id: EmojiId::from(consts::ENGLISH_DAY_EMOJI),
-                name: None,
+                id: EmojiId::from(consts::ENGLISH_DAY_EMOJI.0),
+                name: Some(consts::ENGLISH_DAY_EMOJI.1.to_string()),
             },
         )
         .await
