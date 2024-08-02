@@ -1,17 +1,17 @@
 use chrono::{DateTime, Datelike, Utc};
 use chrono_tz::America::Argentina::Buenos_Aires;
 use regex::Regex;
-use serenity::all::{Context, Message};
+use serenity::all::{Context, EmojiId, Message, ReactionType};
 use tracing::{error, info};
 
 use crate::{consts, helpers};
 
-pub async fn handle(ctx: &Context, msg: &Message, user_id: u64) {
+pub async fn handle(ctx: &Context, msg: &Message) {
     let utc_now: DateTime<Utc> = Utc::now();
 
     let ba_now = utc_now.with_timezone(&Buenos_Aires);
 
-    if consts::ENGLISH_DAY_WHITELIST.contains(&user_id) {
+    if consts::ENGLISH_DAY_WHITELIST.contains(&msg.author.id.into()) {
         return;
     }
 
@@ -29,12 +29,34 @@ pub async fn handle(ctx: &Context, msg: &Message, user_id: u64) {
         return;
     }
 
-    let message = format!(
-        "Today is the english day, please try to send your text messages in english {}",
-        consts::DUDE_EMOJI
-    );
+    if msg.channel_id == consts::ENGLISH_CHANNEL_ID {
+        let message = format!(
+            "Today is the english day, please try to send your messages in english {}",
+            consts::DUDE_EMOJI
+        );
 
-    if let Err(err) = msg.reply(&ctx.http, message).await {
+        if let Err(err) = msg.reply(&ctx.http, message).await {
+            error!("Error on intercept message: {err:?}");
+
+            return;
+        }
+
+        info!("English day message replied");
+
+        return;
+    }
+
+    if let Err(err) = msg
+        .react(
+            &ctx.http,
+            ReactionType::Custom {
+                animated: false,
+                id: EmojiId::from(consts::ENGLISH_DAY_EMOJI),
+                name: None,
+            },
+        )
+        .await
+    {
         error!("Error on intercept message: {err:?}");
 
         return;

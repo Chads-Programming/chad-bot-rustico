@@ -113,7 +113,7 @@ impl EventHandler for Handler {
             return;
         }
 
-        events::english_day::handle(&ctx, &msg, msg.author.id.into()).await;
+        events::english_day::handle(&ctx, &msg).await;
         events::twitter_links_message::handle(&ctx, &msg).await;
     }
 
