@@ -56,8 +56,13 @@ async fn reminder_english_day(State(ctx): State<RouterState>) -> impl IntoRespon
     let response = utils::send_message_to_channel(
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
-        "@here\n Today is the english day".to_string(),
-        Some(consts::BASED_CAT_STICKER),
+        format!(
+            "@here\n Today is the **English Day**, don't forget that those who
+            are interested can interact on <#{}>",
+            consts::ENGLISH_CHANNEL_ID
+        )
+        .to_string(),
+        None,
     )
     .await;
 

@@ -1,7 +1,7 @@
 use chrono::{DateTime, Datelike, Utc};
 use chrono_tz::America::Argentina::Buenos_Aires;
 use regex::Regex;
-use serenity::all::{Context, EmojiId, Message, ReactionType};
+use serenity::all::{Context, Message};
 use tracing::{error, info};
 
 use crate::{consts, helpers};
@@ -29,35 +29,17 @@ pub async fn handle(ctx: &Context, msg: &Message) {
         return;
     }
 
-    if msg.channel_id == consts::ENGLISH_CHANNEL_ID {
-        let message = format!(
-            "Today is the english day, please try to send your messages in english <:{}:{}>",
-            consts::DUDE_EMOJI.1,
-            consts::DUDE_EMOJI.0,
-        );
-
-        if let Err(err) = msg.reply(&ctx.http, message).await {
-            error!("Error on intercept message: {err:?}");
-
-            return;
-        }
-
-        info!("English day message replied");
-
+    if msg.channel_id != consts::ENGLISH_CHANNEL_ID {
         return;
     }
 
-    if let Err(err) = msg
-        .react(
-            &ctx.http,
-            ReactionType::Custom {
-                animated: false,
-                id: EmojiId::from(consts::ENGLISH_DAY_EMOJI.0),
-                name: Some(consts::ENGLISH_DAY_EMOJI.1.to_string()),
-            },
-        )
-        .await
-    {
+    let message = format!(
+        "The messages you send through this channel must be in English during English Day <:{}:{}>",
+        consts::DUDE_EMOJI.1,
+        consts::DUDE_EMOJI.0,
+    );
+
+    if let Err(err) = msg.reply(&ctx.http, message).await {
         error!("Error on intercept message: {err:?}");
 
         return;
