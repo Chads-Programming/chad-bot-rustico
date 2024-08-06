@@ -242,6 +242,10 @@ impl EventHandler for Handler {
                     ContentPayload::from_str(commands::wallet_leaderboard::run(&ctx).await)
                         .defer(true)
                 }
+                "community_courses" => match commands::courses::run(&command) {
+                    Ok(courses) => ContentPayload::from_str(courses),
+                    Err(err) => ContentPayload::from_str(err).ephemeral(true),
+                },
                 _ => ContentPayload::default(),
             };
 
@@ -278,6 +282,7 @@ impl EventHandler for Handler {
                     commands::donate_coins::register(),
                     commands::wallet_info::register(),
                     commands::wallet_leaderboard::register(),
+                    commands::courses::register(),
                 ],
             )
             .await
