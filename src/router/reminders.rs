@@ -57,8 +57,7 @@ async fn reminder_english_day(State(ctx): State<RouterState>) -> impl IntoRespon
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
         format!(
-            "@here\n Today is the **English Day**, don't forget that those who
-            are interested can interact on <#{}>",
+            "@here\n Today is the **English Day**, those who are interested could interact on <#{}>",
             consts::ENGLISH_CHANNEL_ID
         )
         .to_string(),
