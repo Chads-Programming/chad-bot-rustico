@@ -42,7 +42,16 @@ pub async fn run(ctx: &Context) -> Result<String, serenity::Error> {
     let mut contributor_map: HashMap<String, i64> = HashMap::new();
 
     for contributor in all_contributors.into_iter() {
-        let contributor_name = contributor.login.clone();
+        let contributor_name = {
+            let login_name = contributor.login.clone();
+
+            if !login_name.is_empty() {
+                login_name
+            } else {
+                contributor.name.clone()
+            }
+        };
+
         let current_contributions = contributor_map.get(&contributor_name).unwrap_or(&0);
         let updated_contributions = contributor.contributions + current_contributions;
 
@@ -67,7 +76,7 @@ pub async fn run(ctx: &Context) -> Result<String, serenity::Error> {
         .join("\n");
 
     Ok(format!(
-        "\n**Top de contribuidores:**\n\n{leaderboard}\n\n🦊 🚬"
+        "\n**Top de contribuidores en github:**\n\n{leaderboard}\n\n🦊 🚬"
     ))
 }
 
