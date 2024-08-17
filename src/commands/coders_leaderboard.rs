@@ -1,14 +1,18 @@
 use octorust::types::Contributor;
 use serenity::{
-    all::{Context, CreateCommand},
+    all::{
+        CommandInteraction, Context, CreateCommand, CreateEmbed, CreateInteractionResponse,
+        CreateInteractionResponseMessage,
+    },
     futures::future::join_all,
 };
+use tracing::error;
 
 use std::collections::HashMap;
 
 use crate::{consts, github, state::SharedState};
 
-pub async fn run(ctx: &Context) -> Result<String, serenity::Error> {
+pub async fn run(ctx: &Context, command: &CommandInteraction) -> Result<(), serenity::Error> {
     let data = ctx.data.read().await;
     let state = &data.get::<SharedState>().unwrap();
     let github_client = &state.github_client;
@@ -61,23 +65,38 @@ pub async fn run(ctx: &Context) -> Result<String, serenity::Error> {
     let mut reduced_contributors = contributor_map.into_iter().collect::<Vec<(String, i64)>>();
     reduced_contributors.sort_by(|a, b| b.1.cmp(&a.1));
 
-    let leaderboard = reduced_contributors
-        .into_iter()
-        .enumerate()
-        .map(|(index, contributor)| {
-            format!(
-                "**{}** *{}* `[{}]`",
-                index + 1,
-                contributor.0,
-                contributor.1
-            )
-        })
+    let contributors_size: usize = reduced_contributors.len();
+    let positions = (1..=contributors_size)
+        .map(|pos| pos.to_string())
         .collect::<Vec<String>>()
-        .join("\n");
+        .join("\n\n");
 
-    Ok(format!(
-        "\n**Top de contribuidores en github:**\n\n{leaderboard}\n\n🦊 🚬"
-    ))
+    let contributors_name = reduced_contributors
+        .iter()
+        .map(|contrib| contrib.0.to_string())
+        .collect::<Vec<String>>()
+        .join("\n\n");
+
+    let contributors_total = reduced_contributors
+        .into_iter()
+        .map(|contrib| contrib.1.to_string())
+        .collect::<Vec<String>>()
+        .join("\n\n");
+
+    let embed = CreateEmbed::default()
+        .title("**Top de contribuidores en el github de la comunidad**  🦊🚬\n")
+        .field("#", format!("\n{positions}"), true)
+        .field("Github username", format!("\n{contributors_name}"), true)
+        .field("Contributions", format!("\n{contributors_total}"), true);
+
+    let msg = CreateInteractionResponseMessage::new().embed(embed);
+    let builder: CreateInteractionResponse = CreateInteractionResponse::Message(msg);
+
+    if let Err(why) = command.create_response(&ctx.http, builder).await {
+        error!("Cannot respond to slash command: {}", why);
+    };
+
+    Ok(())
 }
 
 pub fn register() -> CreateCommand {

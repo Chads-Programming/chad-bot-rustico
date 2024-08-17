@@ -232,7 +232,15 @@ impl EventHandler for Handler {
 
                     ContentPayload::from_str(content).ephemeral(true)
                 }
-                "coders_leaderboard" => commands::coders_leaderboard::run(&ctx).await.into(),
+                "coders_leaderboard" => {
+                    if let Err(why) = commands::coders_leaderboard::run(&ctx, &command).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+
+                    ContentPayload::default()
+                }
                 "wallet_leaderboard" => {
                     if let Err(why) = command.defer(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
