@@ -51,12 +51,12 @@ async fn publish_free_courses(
         })
         .collect::<Vec<CreateEmbed>>();
 
-    let courses = embeds.chunks(course_chunk_size);
+    let courses_embeds_chunks = embeds.chunks(course_chunk_size);
 
     let mut errors = 0;
     let mut current_chunk = 1;
 
-    for courses_message in courses.into_iter() {
+    for embeds in courses_embeds_chunks.into_iter() {
         let text_content = if current_chunk == 1 {
             Some("@here\n# Cursos gratis de la semana 🦊🚬\n".to_string())
         } else {
@@ -66,7 +66,7 @@ async fn publish_free_courses(
         let send_response = utils::send_embeds_to_channel(
             &ctx.0,
             consts::COURSES_CHANNEL_ID,
-            courses_message.to_vec(),
+            embeds.to_vec(),
             text_content,
         )
         .await;
