@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use serenity::all::{
-    ChannelId, CreateAttachment, CreateMessage, Http, ResolvedOption, ResolvedValue, StickerId,
-    User,
+    ChannelId, CreateAttachment, CreateEmbed, CreateMessage, Http, ResolvedOption, ResolvedValue,
+    StickerId, User,
 };
 use tracing::{error, info};
 
@@ -32,6 +32,33 @@ pub async fn send_message_to_channel(
     if let Some(sticker) = sticker_id {
         message = message.sticker_id(StickerId::new(sticker));
     }
+
+    if let Err(err) = channel.send_message(http, message).await {
+        error!("Error on send message: {err}");
+
+        return Err(err);
+    }
+
+    info!("Message was sending to channel");
+
+    Ok(())
+}
+
+pub async fn send_embeds_to_channel(
+    http: &Http,
+    channel_id: u64,
+    embeds: Vec<CreateEmbed>,
+    content: Option<String>,
+) -> Result<(), serenity::Error> {
+    let channel = ChannelId::new(channel_id);
+
+    let mut message = CreateMessage::new();
+
+    if let Some(txt) = content {
+        message = message.content(txt);
+    }
+
+    message = message.add_embeds(embeds);
 
     if let Err(err) = channel.send_message(http, message).await {
         error!("Error on send message: {err}");
