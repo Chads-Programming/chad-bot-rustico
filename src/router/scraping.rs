@@ -5,7 +5,7 @@ use axum::{extract::State, response::IntoResponse};
 use axum::{Json, Router};
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use serenity::all::ChannelId;
+use serenity::all::{ChannelId, Colour, CreateEmbed};
 use tracing::{error, info};
 
 pub type FreeCourses = Vec<FreeCourse>;
@@ -39,35 +39,35 @@ async fn publish_free_courses(
     let course_chunk_size = 5;
     let total_courses = body.len();
 
-    let formated_messages = body
+    let embeds = body
         .into_iter()
         .map(|free_course| {
-            format!(
-                "**{}**\nCódigo: `{}`\nTiempo para reclamar: `{}`\n🔗 [enlace]({})",
-                free_course.title, free_course.code, free_course.countdown, free_course.link,
-            )
+            CreateEmbed::new()
+                .title(format!("**{}**", free_course.title))
+                .field("**Código**", free_course.code, true)
+                .field("**Tiempo para reclamar**", free_course.countdown, true)
+                .url(free_course.link)
+                .color(Colour::from_rgb(15, 137, 64))
         })
-        .collect::<Vec<String>>();
+        .collect::<Vec<CreateEmbed>>();
 
-    let courses = formated_messages.chunks(course_chunk_size);
+    let courses_embeds_chunks = embeds.chunks(course_chunk_size);
 
     let mut errors = 0;
     let mut current_chunk = 1;
 
-    for courses_message in courses {
-        let msg = courses_message.join("\n\n");
-
-        let formated_message = if current_chunk == 1 {
-            format!("@here\n\n**Cursos gratis de la semana**\n\n{msg}")
+    for embeds in courses_embeds_chunks.into_iter() {
+        let text_content = if current_chunk == 1 {
+            Some("@here\n# Cursos gratis de la semana 🦊🚬\n".to_string())
         } else {
-            format!("_\n\n{msg}")
+            None
         };
 
-        let send_response = utils::send_message_to_channel(
+        let send_response = utils::send_embeds_to_channel(
             &ctx.0,
             consts::COURSES_CHANNEL_ID,
-            formated_message,
-            None,
+            embeds.to_vec(),
+            text_content,
         )
         .await;
 
