@@ -1,7 +1,4 @@
-use std::path::Path;
-
 use crate::{commands, consts, events, utils, welcome};
-use chrono::Utc;
 use serenity::all::{
     CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Member, Message,
 };

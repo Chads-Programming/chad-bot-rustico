@@ -1,13 +1,10 @@
 use std::path::Path;
 
 use chrono::Utc;
-use serenity::{
-    all::{Context, GuildId, Member, UserId},
-    futures::TryFutureExt,
-};
+use serenity::all::{Context, GuildId, Member};
+use tracing::log::error as log_error;
 
 use crate::{consts, utils};
-use tracing::log::error as log_error;
 
 pub async fn send_welcome_banner(guild_id: &GuildId, ctx: &Context, member: &Member) {
     let response = reqwest::get(member.face()).await.unwrap();
