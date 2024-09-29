@@ -12,6 +12,7 @@ mod router;
 mod state;
 mod utils;
 mod wallet;
+mod welcome;
 
 use std::sync::Arc;
 
