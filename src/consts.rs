@@ -19,3 +19,4 @@ pub const ENGLISH_DAYS: [chrono::Weekday; 2] = [chrono::Weekday::Wed, chrono::We
 pub const ENGLISH_DAY_WHITELIST: [u64; 1] = [1072587560116817930];
 pub const DUDE_EMOJI: (u64, &str) = (1257619715430420540, "tonohmm");
 pub const ENGLISH_CHANNEL_ID: u64 = 1246229913099305013;
+pub const GITHUB_ORGANIZATION: &str = "https://github.com/Chads-Programming";

@@ -121,6 +121,7 @@ impl EventHandler for Handler {
         let guild_id = GuildId::new(self.guild_id);
 
         welcome::banner::send_welcome_banner(&guild_id, &ctx, &member).await;
+        welcome::info::send_dm_welcome_information(&ctx, &member.user).await;
     }
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {

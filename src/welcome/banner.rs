@@ -1,7 +1,10 @@
 use std::path::Path;
 
 use chrono::Utc;
-use serenity::all::{Context, GuildId, Member};
+use serenity::{
+    all::{Context, GuildId, Member, UserId},
+    futures::TryFutureExt,
+};
 
 use crate::{consts, utils};
 use tracing::log::error as log_error;
@@ -45,16 +48,15 @@ pub async fn send_welcome_banner(guild_id: &GuildId, ctx: &Context, member: &Mem
         log_error!("{err:?}");
     }
 
-    if let Err(err) = utils::send_file_message_to_channel(
+    let send_result = utils::send_file_message_to_channel(
         &ctx.http,
         consts::WELCOME_CHANNEL_ID,
         &format!("Bienvenido a este humilde servidor: <@{}>", member.user.id),
         Path::new(&output_path),
     )
-    .await
-    {
+    .await;
+
+    if let Err(err) = send_result {
         log_error!("{err:?}");
     }
 }
-
-// fn create_welcome_message() {}
