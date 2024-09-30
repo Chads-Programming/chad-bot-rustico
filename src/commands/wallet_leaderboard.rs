@@ -1,33 +1,49 @@
-use serenity::all::{Context, CreateCommand};
+use serenity::all::{Colour, Context, CreateCommand, CreateEmbed};
 
-use crate::state::SharedState;
+use crate::{errors::CustomError, state::SharedState};
 
-pub async fn run(ctx: &Context) -> String {
+pub async fn run(ctx: &Context) -> Result<Vec<CreateEmbed>, CustomError> {
     let data = ctx.data.read().await;
     let state = &data.get::<SharedState>().unwrap();
     let wallet_service = &state.wallet_service;
 
     match wallet_service.find_members_sort_by_wallet_amount().await {
         Ok(members) => {
-            let leaderboard = members
+            let leaderboard_embeds = members
                 .into_iter()
                 .enumerate()
                 .map(|(index, member)| {
-                    format!(
-                        "**{}** *<@{}>* `[{}]`\n",
-                        index + 1,
-                        member.discord_id,
-                        member.amount
-                    )
-                })
-                .collect::<Vec<String>>()
-                .join("\n\n");
+                    let position = index + 1;
+                    let position_meta = match position {
+                        1 => (
+                            format!("🥇 **{}st position**", position),
+                            Colour::from_rgb(221, 204, 40),
+                        ),
+                        2 => (
+                            format!("🥈 **{}nd position**", position),
+                            Colour::from_rgb(135, 136, 138),
+                        ),
+                        3 => (
+                            format!("🥉 **{}rd position**", position),
+                            Colour::from_rgb(170, 129, 17),
+                        ),
+                        _ => (
+                            format!("🎖️ **{}th position**", position),
+                            Colour::from_rgb(11, 137, 64),
+                        ),
+                    };
 
-            format!("\n**Top Richachones:**\n\n {leaderboard} \n\n🤑 🏦 ")
+                    CreateEmbed::new()
+                        .title(position_meta.0)
+                        .field("Amount", format!("`{}`", member.amount), true)
+                        .field("Member", format!("<@{}>", member.discord_id), true)
+                        .color(position_meta.1)
+                })
+                .collect::<Vec<CreateEmbed>>();
+
+            Ok(leaderboard_embeds)
         }
-        Err(err) => {
-            format!("Error: {}", err)
-        }
+        Err(err) => Err(err),
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::{commands, consts, events, utils, welcome};
 use serenity::all::{
-    CommandInteraction, CreateAllowedMentions, CreateInteractionResponseFollowup, Member, Message,
+    CommandInteraction, CreateAllowedMentions, CreateEmbed, CreateInteractionResponseFollowup,
+    Member, Message,
 };
 use serenity::async_trait;
 use serenity::{
@@ -14,6 +15,26 @@ use tracing::log::{error as log_error, info};
 
 struct Handler {
     pub guild_id: u64,
+}
+
+struct EmbedPayload {
+    embeds: Vec<CreateEmbed>,
+    defer: bool,
+}
+
+impl EmbedPayload {
+    pub fn new(embeds: Vec<CreateEmbed>) -> Self {
+        Self {
+            embeds,
+            defer: false,
+        }
+    }
+
+    pub fn defer(mut self, defer: bool) -> Self {
+        self.defer = defer;
+
+        self
+    }
 }
 
 struct ContentPayload {
@@ -92,12 +113,42 @@ impl Handler {
             info!("Cannot respond to slash command: {}", why);
         }
     }
+
+    pub async fn dispatch_embed_response(
+        ctx: &Context,
+        command: &CommandInteraction,
+        embeds: Vec<CreateEmbed>,
+        defer: bool,
+    ) {
+        if defer {
+            let builder = CreateInteractionResponseFollowup::new().embeds(embeds);
+
+            if let Err(why) = command.create_followup(&ctx.http, builder).await {
+                info!("Cannot respond to slash command: {}", why);
+            }
+
+            return;
+        }
+
+        let data = CreateInteractionResponseMessage::new().embeds(embeds);
+
+        let builder: CreateInteractionResponse = CreateInteractionResponse::Message(data);
+
+        if let Err(why) = command.create_response(&ctx.http, builder).await {
+            info!("Cannot respond to slash command: {}", why);
+        }
+    }
 }
 
 impl From<Result<String, serenity::Error>> for ContentPayload {
     fn from(result: Result<String, serenity::Error>) -> Self {
         match result {
-            Ok(msg) => Self::from_str(msg),
+            Ok(msg) => ContentPayload {
+                content: Some(msg),
+                ephemeral: false,
+                defer: false,
+                allowed_mentions: true,
+            },
             Err(_) => Self::default(),
         }
     }
@@ -123,7 +174,39 @@ impl EventHandler for Handler {
 
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
-            let content_payload = match command.data.name.as_str() {
+            let command_name = command.data.name.as_str();
+
+            let embed_payload = match &command_name {
+                &"wallet_leaderboard" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+
+                    match commands::wallet_leaderboard::run(&ctx).await {
+                        Ok(embed) => Some(EmbedPayload::new(embed).defer(true)),
+                        Err(err) => {
+                            log_error!("Error deferring interaction: {:?}", err);
+
+                            None
+                        }
+                    }
+                }
+                _ => None,
+            };
+
+            if let Some(payload) = embed_payload {
+                return Handler::dispatch_embed_response(
+                    &ctx,
+                    &command,
+                    payload.embeds,
+                    payload.defer,
+                )
+                .await;
+            }
+
+            let content_payload = match command_name {
                 "register_wallet" => {
                     if let Err(why) = command.defer_ephemeral(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
@@ -192,15 +275,6 @@ impl EventHandler for Handler {
                     }
 
                     ContentPayload::default()
-                }
-                "wallet_leaderboard" => {
-                    if let Err(why) = command.defer(&ctx.http).await {
-                        log_error!("Error deferring interaction: {:?}", why);
-
-                        return;
-                    }
-                    ContentPayload::from_str(commands::wallet_leaderboard::run(&ctx).await)
-                        .defer(true)
                 }
                 "community_courses" => match commands::courses::run(&command) {
                     Ok(courses) => ContentPayload::from_str(courses),
