@@ -1,4 +1,4 @@
-use crate::{commands, consts, events, utils, welcome};
+use crate::{commands, consts, events, welcome};
 use serenity::all::{
     CommandInteraction, CreateAllowedMentions, CreateEmbed, CreateInteractionResponseFollowup,
     Member, Message,
@@ -258,12 +258,7 @@ impl EventHandler for Handler {
                 }
                 "list_projects" => commands::list_projects::run(&ctx).await.into(),
                 "warn" => {
-                    let user_option = utils::get_user_from_query(&command.data.options());
-
-                    let content = match user_option {
-                        Some(user) => commands::warn::run(&ctx, &user).await,
-                        None => "Debe establecer un usuario".to_string(),
-                    };
+                    let content = commands::warn::run(&ctx, &command).await;
 
                     ContentPayload::from_str(content).ephemeral(true)
                 }

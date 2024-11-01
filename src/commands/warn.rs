@@ -1,15 +1,47 @@
-use serenity::all::{CommandOptionType, Context, CreateCommand, CreateCommandOption, User};
+use serenity::all::{
+    CommandInteraction, CommandOptionType, Context, CreateCommand, CreateCommandOption,
+    ResolvedOption, ResolvedValue,
+};
 
-use crate::gifs;
+pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> String {
+    let options = &interaction.data.options().clone();
 
-pub async fn run(ctx: &Context, user: &User) -> String {
-    let target_user = user.clone();
+    let option_user = if let Some(ResolvedOption {
+        value: ResolvedValue::User(user, _),
+        ..
+    }) = options.first()
+    {
+        Some(user)
+    } else {
+        None
+    };
+
+    let reason_option = if let Some(ResolvedOption {
+        value: ResolvedValue::String(reason),
+        ..
+    }) = options.get(1)
+    {
+        Some(*reason)
+    } else {
+        None
+    };
+
+    if option_user.is_none() {
+        return "No se especifico un usuario".to_string();
+    }
+
+    let target_user = option_user.unwrap();
 
     match target_user.create_dm_channel(&ctx.http).await {
         Ok(channel) => {
-            let name = target_user.name;
-            let image_url = gifs::WARN_CAT;
-            let message = format!("\n**Quieto ahí pibardo!**\nEstimado: *{name}* se le informa educamente que **ha sido advertido** \n[hungry_cat]({image_url})");
+            let name = target_user.name.clone();
+            let base_message = format!("\n**Quieto ahí pibardo!**\nEstimado: *{name}* se le informa educamente que **ha sido advertido**");
+
+            let message = if let Some(reason) = reason_option {
+                format!("{base_message}\nRazón:`{reason}`")
+            } else {
+                base_message
+            };
 
             channel.say(&ctx.http, message).await.unwrap();
 
@@ -24,6 +56,10 @@ pub fn register() -> CreateCommand {
         .description("Send a warn message to user")
         .add_option(
             CreateCommandOption::new(CommandOptionType::User, "user", "The user to lookup")
+                .required(true),
+        )
+        .add_option(
+            CreateCommandOption::new(CommandOptionType::String, "reason", "The reason of warn")
                 .required(true),
         )
 }
