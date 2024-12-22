@@ -1,4 +1,8 @@
-workspace = { members = ["crates/gen_image"] }
+workspace = { members = [
+    "crates/cripto_api",
+    "crates/gen_image",
+], dependencies = { reqwest = { workspace = true }, serde = { workspace = true }, serde_json = { workspace = true }, strum = { workspace = true }, strum_macros = { workspace = true } } }
+
 
 [package]
 name = "chad-discord-bot"
@@ -17,7 +21,6 @@ tokio = "1.28.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 octorust = { version = "0.7.0", features = ["httpcache"] }
-reqwest = "=0.12.5"
 serenity = { version = "0.12.2", features = [
     "client",
     "gateway",
@@ -47,3 +50,7 @@ lingua = { version = "1.6.2", default-features = false, features = [
 ] }
 chrono-tz = "0.9.0"
 gen_image = { version = "0.1.0", path = "crates/gen_image" }
+cripto_api = { version = "0.1.0", path = "crates/cripto_api" }
+reqwest = "=0.12.5"
+strum = "0.26"
+strum_macros = "0.26"
