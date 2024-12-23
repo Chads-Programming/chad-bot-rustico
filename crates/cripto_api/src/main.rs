@@ -1,10 +1,10 @@
-use cripto_api::{api::CoinService, coins::CoinID};
+use cripto_api::{api::CoinService, coin_gecko::CoinGeckoService, coins::CoinID};
 
 const API_KEY: &str = "YOUR API KEY";
 
 #[tokio::main]
 async fn main() {
-    let coin_service = CoinService::new(API_KEY);
+    let coin_service = CoinGeckoService::new(API_KEY);
 
     println!(
         "Bitcoin {:?}",
