@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug)]
 pub struct CoinPrice {
     pub currency: PriceCurrency,
     pub value: f64,
@@ -20,6 +21,7 @@ struct PricePairs {
     ars: f64,
 }
 
+#[derive(Debug)]
 pub struct CoinResponse {
     pub name: String,
     pub prices: Vec<CoinPrice>,
@@ -34,15 +36,25 @@ impl Default for CoinResponse {
     }
 }
 
+#[derive(strum_macros::Display)]
 pub enum CoinID {
-    BITCOIN,
-    SOLANA,
-    USUAL,
+    #[strum(serialize = "bitcoin")]
+    Bitcoin,
+    #[strum(serialize = "solana")]
+    Solana,
+    #[strum(serialize = "usual")]
+    Usual,
+    #[strum(serialize = "ripple")]
     XRP,
-    DOT,
+    #[strum(serialize = "polkadot")]
+    Polkadot,
+    #[strum(serialize = "pepe")]
+    Pepe,
+    #[strum(serialize = "doge")]
+    Doge,
 }
 
-#[derive(strum_macros::Display)]
+#[derive(strum_macros::Display, Debug)]
 pub enum PriceCurrency {
     #[strum(serialize = "usd")]
     USD,
@@ -50,20 +62,6 @@ pub enum PriceCurrency {
     EUR,
     #[strum(serialize = "ars")]
     ARS,
-}
-
-impl CoinID {
-    pub fn to_str(&self) -> String {
-        let str_coind_id = match self {
-            CoinID::BITCOIN => "bitcoin",
-            CoinID::SOLANA => "sol",
-            CoinID::USUAL => "usual",
-            CoinID::XRP => "xrp",
-            CoinID::DOT => "dto",
-        };
-
-        String::from(str_coind_id)
-    }
 }
 
 impl From<GeckoCoinPrice> for CoinResponse {
@@ -77,11 +75,11 @@ impl From<GeckoCoinPrice> for CoinResponse {
                         value: price.usd,
                     },
                     CoinPrice {
-                        currency: PriceCurrency::EUR,
+                        currency: PriceCurrency::ARS,
                         value: price.ars,
                     },
                     CoinPrice {
-                        currency: PriceCurrency::ARS,
+                        currency: PriceCurrency::EUR,
                         value: price.eur,
                     },
                 ],
