@@ -48,6 +48,7 @@ impl From<GeckoCoinPrice> for CoinResponse {
     }
 }
 
+#[derive(Clone)]
 pub struct CoinGeckoService {
     api_key: String,
 }

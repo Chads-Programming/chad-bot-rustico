@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(Debug)]
 pub struct CoinPrice {
     pub currency: PriceCurrency,
@@ -45,4 +47,24 @@ pub enum PriceCurrency {
     EUR,
     #[strum(serialize = "ars")]
     ARS,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub struct ParseCoinIDError;
+
+impl FromStr for CoinID {
+    type Err = ParseCoinIDError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "bitcoin" => Ok(CoinID::Bitcoin),
+            "solana" => Ok(CoinID::Solana),
+            "usual" => Ok(CoinID::Doge),
+            "pepe" => Ok(CoinID::Pepe),
+            "doge" => Ok(CoinID::Doge),
+            "polkadot" => Ok(CoinID::Polkadot),
+            "ripple" => Ok(CoinID::XRP),
+            _ => Err(ParseCoinIDError),
+        }
+    }
 }

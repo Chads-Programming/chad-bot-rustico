@@ -176,8 +176,8 @@ impl EventHandler for Handler {
         if let Interaction::Command(command) = interaction {
             let command_name = command.data.name.as_str();
 
-            let embed_payload = match &command_name {
-                &"wallet_leaderboard" => {
+            let embed_payload = match command_name {
+                "wallet_leaderboard" => {
                     if let Err(why) = command.defer(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
 
@@ -186,6 +186,22 @@ impl EventHandler for Handler {
 
                     match commands::wallet_leaderboard::run(&ctx).await {
                         Ok(embed) => Some(EmbedPayload::new(embed).defer(true)),
+                        Err(err) => {
+                            log_error!("Error deferring interaction: {:?}", err);
+
+                            None
+                        }
+                    }
+                }
+                "cripto_price" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+
+                    match commands::crypto_prices::run(&ctx, &command).await {
+                        Ok(embed) => Some(EmbedPayload::new(vec![embed])),
                         Err(err) => {
                             log_error!("Error deferring interaction: {:?}", err);
 
@@ -312,6 +328,7 @@ impl EventHandler for Handler {
                     commands::wallet_info::register(),
                     commands::wallet_leaderboard::register(),
                     commands::courses::register(),
+                    commands::crypto_prices::register(),
                 ],
             )
             .await
