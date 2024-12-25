@@ -43,10 +43,14 @@ pub async fn run(ctx: &Context, command: &CommandInteraction) -> Result<CreateEm
 
     match price_result {
         Ok(price_detail) => Ok({
-            let mut embed = CreateEmbed::new().title(price_detail.name);
+            let mut embed = CreateEmbed::new().title(price_detail.name.to_uppercase());
 
             for price in price_detail.prices.into_iter() {
-                embed = embed.field(price.currency.to_string(), price.value.to_string(), false)
+                embed = embed.field(
+                    price.currency.to_string().to_uppercase(),
+                    price.value.to_string(),
+                    true,
+                )
             }
 
             embed

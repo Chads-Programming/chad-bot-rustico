@@ -193,7 +193,7 @@ impl EventHandler for Handler {
                         }
                     }
                 }
-                "cripto_price" => {
+                "crypto_prices" => {
                     if let Err(why) = command.defer(&ctx.http).await {
                         log_error!("Error deferring interaction: {:?}", why);
 
@@ -201,9 +201,9 @@ impl EventHandler for Handler {
                     }
 
                     match commands::crypto_prices::run(&ctx, &command).await {
-                        Ok(embed) => Some(EmbedPayload::new(vec![embed])),
+                        Ok(embed) => Some(EmbedPayload::new(vec![embed]).defer(true)),
                         Err(err) => {
-                            log_error!("Error deferring interaction: {:?}", err);
+                            log_error!("Error on interaction: {:?}", err);
 
                             None
                         }
