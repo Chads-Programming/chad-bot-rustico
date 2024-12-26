@@ -1,11 +1,23 @@
 use cripto_api::{api::CoinService, coins::CoinID};
+use num_format::{Locale, ToFormattedString};
 use serenity::all::{
     CommandInteraction, Context, CreateCommand, CreateCommandOption, CreateEmbed, ResolvedOption,
     ResolvedValue,
 };
+
 use std::str::FromStr;
 
 use crate::{errors::CustomError, state::SharedState};
+
+const COINS: [CoinID; 7] = [
+    CoinID::Bitcoin,
+    CoinID::Solana,
+    CoinID::XRP,
+    CoinID::Pepe,
+    CoinID::Doge,
+    CoinID::Polkadot,
+    CoinID::Usual,
+];
 
 pub async fn run(ctx: &Context, command: &CommandInteraction) -> Result<CreateEmbed, CustomError> {
     let data = ctx.data.read().await;
@@ -46,9 +58,19 @@ pub async fn run(ctx: &Context, command: &CommandInteraction) -> Result<CreateEm
             let mut embed = CreateEmbed::new().title(price_detail.name.to_uppercase());
 
             for price in price_detail.prices.into_iter() {
+                let formated_price = if price.value >= 1.0 {
+                    let integer_price = price.value.floor() as i64;
+                    let decimal_price_part = format!("{:.3}", (price.value % integer_price as f64));
+                    let formated_integer = integer_price.to_formatted_string(&Locale::en);
+
+                    format!("{}.{}", formated_integer, &decimal_price_part[2..])
+                } else {
+                    price.value.to_string()
+                };
+
                 embed = embed.field(
                     price.currency.to_string().to_uppercase(),
-                    price.value.to_string(),
+                    formated_price,
                     true,
                 )
             }
@@ -63,21 +85,21 @@ pub async fn run(ctx: &Context, command: &CommandInteraction) -> Result<CreateEm
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("crypto_prices")
-        .description("Mostrar el precio actual de una cripto divisa")
-        .add_option(
-            CreateCommandOption::new(
-                serenity::all::CommandOptionType::String,
-                "coin",
-                "El nombre de la modena",
-            )
-            .add_string_choice(CoinID::Bitcoin.to_string(), CoinID::Bitcoin.to_string())
-            .add_string_choice(CoinID::Solana.to_string(), CoinID::Solana.to_string())
-            .add_string_choice(CoinID::XRP.to_string(), CoinID::XRP.to_string())
-            .add_string_choice(CoinID::Pepe.to_string(), CoinID::Pepe.to_string())
-            .add_string_choice(CoinID::Doge.to_string(), CoinID::Doge.to_string())
-            .add_string_choice(CoinID::Usual.to_string(), CoinID::Usual.to_string())
-            .add_string_choice(CoinID::Polkadot.to_string(), CoinID::Polkadot.to_string())
-            .required(true),
-        )
+    let command = CreateCommand::new("crypto_prices")
+        .description("Mostrar el precio actual de una cripto divisa");
+
+    let mut option = CreateCommandOption::new(
+        serenity::all::CommandOptionType::String,
+        "coin",
+        "El nombre de la modena",
+    )
+    .required(true);
+
+    for coin in COINS.into_iter() {
+        let coin_name = coin.to_string();
+
+        option = option.add_string_choice(coin_name.to_uppercase(), coin_name);
+    }
+
+    command.add_option(option)
 }

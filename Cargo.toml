@@ -54,6 +54,9 @@ lingua = { version = "1.6.2", default-features = false, features = [
     "spanish",
 ] }
 chrono-tz = "0.9.0"
+num-format = { version = "0.4.4" }
+
+
 gen_image = { version = "0.1.0", path = "crates/gen_image" }
 cripto_api = { version = "0.1.0", path = "crates/cripto_api" }
 
