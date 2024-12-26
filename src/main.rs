@@ -16,6 +16,7 @@ mod welcome;
 use std::sync::Arc;
 
 use axum::{Router, ServiceExt};
+use cripto_api::coin_gecko::CoinGeckoService;
 use octorust::{auth::Credentials, Client as GithubClient};
 use projects::repository::ProjectRepository;
 use router::setup::{RouterSecrets, RouterState};
@@ -71,6 +72,9 @@ async fn main(
         .expect("github token required");
 
     let bot_api_key = secret_store.get("API_KEY").expect("bot api key required");
+    let gecko_api_key = secret_store
+        .get("COIN_GECKO_API_KEY")
+        .expect("coin gecko api key is required");
 
     let connection_url = secret_store.get("DATABASE_URL").expect("base url required");
     let discord_client = bot::setup(token, guild_id).await;
@@ -91,6 +95,7 @@ async fn main(
             project_repository: ProjectRepository::new(Arc::new(pool.clone())),
             github_client: github_client.clone(),
             wallet_service: wallet_service.clone(),
+            coin_service: CoinGeckoService::new(gecko_api_key.as_str()),
         });
     }
 

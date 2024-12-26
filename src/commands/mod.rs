@@ -1,6 +1,7 @@
 pub mod bans_info;
 pub mod coders_leaderboard;
 pub mod courses;
+pub mod crypto_prices;
 pub mod donate_coins;
 pub mod fox;
 pub mod list_projects;

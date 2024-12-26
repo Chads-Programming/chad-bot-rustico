@@ -1,4 +1,16 @@
-workspace = { members = ["crates/gen_image"] }
+[workspace]
+members = ["crates/cripto_api", "crates/gen_image"]
+
+
+[workspace.dependencies]
+reqwest = { version = "=0.12.5" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+strum = { version = "0.26" }
+strum_macros = { version = "0.26" }
+tokio = { version = "1.28.2" }
+async-trait = { version = "0.1.83" }
+
 
 [package]
 name = "chad-discord-bot"
@@ -13,11 +25,7 @@ authors = [
 [dependencies]
 axum = "0.7.4"
 shuttle-runtime = "0.48.0"
-tokio = "1.28.2"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
 octorust = { version = "0.7.0", features = ["httpcache"] }
-reqwest = "=0.12.5"
 serenity = { version = "0.12.2", features = [
     "client",
     "gateway",
@@ -46,4 +54,16 @@ lingua = { version = "1.6.2", default-features = false, features = [
     "spanish",
 ] }
 chrono-tz = "0.9.0"
+num-format = { version = "0.4.4" }
+
+
 gen_image = { version = "0.1.0", path = "crates/gen_image" }
+cripto_api = { version = "0.1.0", path = "crates/cripto_api" }
+
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
