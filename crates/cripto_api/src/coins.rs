@@ -35,7 +35,7 @@ pub enum CoinID {
     Polkadot,
     #[strum(serialize = "pepe")]
     Pepe,
-    #[strum(serialize = "doge")]
+    #[strum(serialize = "dogecoin")]
     Doge,
 }
 
@@ -59,7 +59,7 @@ impl FromStr for CoinID {
         match s {
             "bitcoin" => Ok(CoinID::Bitcoin),
             "solana" => Ok(CoinID::Solana),
-            "usual" => Ok(CoinID::Doge),
+            "usual" => Ok(CoinID::Usual),
             "pepe" => Ok(CoinID::Pepe),
             "doge" => Ok(CoinID::Doge),
             "polkadot" => Ok(CoinID::Polkadot),
