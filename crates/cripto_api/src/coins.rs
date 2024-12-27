@@ -61,7 +61,7 @@ impl FromStr for CoinID {
             "solana" => Ok(CoinID::Solana),
             "usual" => Ok(CoinID::Usual),
             "pepe" => Ok(CoinID::Pepe),
-            "doge" => Ok(CoinID::Doge),
+            "dogecoin" => Ok(CoinID::Doge),
             "polkadot" => Ok(CoinID::Polkadot),
             "ripple" => Ok(CoinID::XRP),
             _ => Err(ParseCoinIDError),
