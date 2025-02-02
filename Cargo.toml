@@ -24,7 +24,7 @@ authors = [
 
 [dependencies]
 axum = "0.7.4"
-shuttle-runtime = "0.48.0"
+shuttle-runtime = "0.51.0"
 octorust = { version = "0.7.0", features = ["httpcache"] }
 serenity = { version = "0.12.2", features = [
     "client",
@@ -35,7 +35,7 @@ serenity = { version = "0.12.2", features = [
 ] }
 tracing = "0.1.40"
 anyhow = "1.0.86"
-shuttle-serenity = "0.48.0"
+shuttle-serenity = "0.51.0"
 chrono = { version = "0.4.34", features = ["serde"] }
 sqlx = { version = "0.7", features = [
     "runtime-async-std",
