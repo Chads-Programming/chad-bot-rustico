@@ -1,6 +1,6 @@
 use super::setup::RouterState;
-use crate::consts;
 use crate::utils;
+use crate::{consts, meme};
 use axum::routing::post;
 use axum::Router;
 use reqwest::StatusCode;
@@ -9,11 +9,17 @@ use axum::{extract::State, response::IntoResponse};
 use tracing::{error, info};
 
 async fn reminder_good_night(State(ctx): State<RouterState>) -> impl IntoResponse {
-    let response = utils::send_message_to_channel(
+    let embeb_meme_result = meme::create_meme_embeb().await;
+
+    if embeb_meme_result.is_err() {
+        return (StatusCode::BAD_GATEWAY, "Error on generate meme").into_response();
+    }
+
+    let response = utils::send_embeds_to_channel(
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
-        "Buenas noches gente".to_string(),
-        Some(consts::CAT_CHAD_STICKER),
+        vec![embeb_meme_result.unwrap()],
+        Some("Buenas noches gente".to_string()),
     )
     .await;
 
@@ -29,11 +35,17 @@ async fn reminder_good_night(State(ctx): State<RouterState>) -> impl IntoRespons
 }
 
 async fn reminder_good_morning(State(ctx): State<RouterState>) -> impl IntoResponse {
-    let response = utils::send_message_to_channel(
+    let embeb_meme_result = meme::create_meme_embeb().await;
+
+    if embeb_meme_result.is_err() {
+        return (StatusCode::BAD_GATEWAY, "Error on generate meme").into_response();
+    }
+
+    let response = utils::send_embeds_to_channel(
         &ctx.0,
         consts::GENERAL_CHANNEL_ID,
-        "Buenos días gente".to_string(),
-        Some(consts::BASED_CAT_STICKER),
+        vec![embeb_meme_result.unwrap()],
+        Some("Buenos días gente".to_string()),
     )
     .await;
 
