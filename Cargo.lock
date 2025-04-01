@@ -636,6 +636,7 @@ dependencies = [
  "cripto_api",
  "gen_image",
  "lingua",
+ "meme_generator",
  "num-format",
  "octorust",
  "regex",
@@ -2227,6 +2228,19 @@ name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
+
+[[package]]
+name = "meme_generator"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "reqwest 0.12.5",
+ "serde",
+ "serde_json",
+ "strum 0.26.3",
+ "strum_macros 0.26.4",
+ "tokio",
+]
 
 [[package]]
 name = "mime"

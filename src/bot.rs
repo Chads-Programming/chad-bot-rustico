@@ -209,6 +209,21 @@ impl EventHandler for Handler {
                         }
                     }
                 }
+                "meme" => {
+                    if let Err(why) = command.defer(&ctx.http).await {
+                        log_error!("Error deferring interaction: {:?}", why);
+
+                        return;
+                    }
+                    match commands::meme::run(&ctx, &command).await {
+                        Ok(embed) => Some(EmbedPayload::new(vec![embed]).defer(true)),
+                        Err(err) => {
+                            log_error!("Error on interaction: {:?}", err);
+
+                            None
+                        }
+                    }
+                }
                 _ => None,
             };
 
@@ -329,6 +344,7 @@ impl EventHandler for Handler {
                     commands::wallet_leaderboard::register(),
                     commands::courses::register(),
                     commands::crypto_prices::register(),
+                    commands::meme::register(),
                 ],
             )
             .await

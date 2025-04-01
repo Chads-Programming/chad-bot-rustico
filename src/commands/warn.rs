@@ -1,6 +1,6 @@
 use serenity::all::{
     CommandInteraction, CommandOptionType, Context, CreateCommand, CreateCommandOption,
-    ResolvedOption, ResolvedValue,
+    Permissions, ResolvedOption, ResolvedValue,
 };
 
 pub async fn run(ctx: &Context, interaction: &CommandInteraction) -> String {
@@ -62,4 +62,5 @@ pub fn register() -> CreateCommand {
             CreateCommandOption::new(CommandOptionType::String, "reason", "The reason of warn")
                 .required(true),
         )
+        .default_member_permissions(Permissions::ADMINISTRATOR)
 }

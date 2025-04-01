@@ -1,4 +1,8 @@
 id = "proj_01JK2AC6TTKNA7J84A9J35A81X"
+[build]
+assets = [
+  "assets/*",
+]
 [deploy]
 include = [
   "assets/*",

@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/cripto_api", "crates/gen_image"]
+members = ["crates/cripto_api", "crates/gen_image", "crates/meme_generator"]
 
 
 [workspace.dependencies]
@@ -59,6 +59,7 @@ num-format = { version = "0.4.4" }
 
 gen_image = { version = "0.1.0", path = "crates/gen_image" }
 cripto_api = { version = "0.1.0", path = "crates/cripto_api" }
+meme_generator ={ version = "0.1.0", path = "crates/meme_generator" }
 
 reqwest = { workspace = true }
 serde = { workspace = true }

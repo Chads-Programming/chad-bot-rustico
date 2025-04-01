@@ -13,13 +13,13 @@ Se debe de instalar `shuttle` para ello usar `cargo-binstall`.
 
 #### 🍎 Mac / 🐧Linux:
 ```bash
-curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+curl -sSfL https://www.shuttle.dev/install | bash
 ```
 
 ####  Para Windows:
 
 ```powershell
-Set-ExecutionPolicy Unrestricted -Scope Process; iex (iwr "https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.ps1").Content
+iwr https://www.shuttle.dev/install-win | iex
 ```
 
 Una vez instalado instalamos shuttle:
@@ -33,7 +33,7 @@ cargo binstall cargo-shuttle
 
 Luego ejecuta el siguiente comando para ejecutar de modo local el bot:
 ```bash
-cargo shuttle run
+shuttle run
 ```
 
 ## Producción
@@ -41,7 +41,7 @@ cargo shuttle run
 Para ejecutar el bot en modo producción debemos ejecutar el siguiente comando:
 
 ```bash
-cargo shuttle deploy
+shuttle deploy
 ```
 
 Esto deployara en Shuttle el bot.

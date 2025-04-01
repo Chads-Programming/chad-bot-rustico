@@ -34,8 +34,10 @@ fn generate_welcome_information(user_id: UserId) -> String {
         Recuerda registrarte primero en la wallet y cada semana se te acreditarán **chad-coins** (solo válido dentro del servidor) ¡Estamos emocionados de que formes parte!"
     );
 
+    let website = "Visita nuestro website: https://chads-programming.dev";
+
     format!(
-        "🎉 **Bienvenido/a: ** <@{}> 🎉\nTe dejamos presente la siguiente información: \n\n{github_information}\n\n{wallet_information}",
+        "🎉 **Bienvenido/a: ** <@{}> 🎉\nTe dejamos presente la siguiente información: \n\n{github_information}\n\n{wallet_information}\n\n{website}",
         user_id
     )
 }

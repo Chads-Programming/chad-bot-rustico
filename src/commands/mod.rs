@@ -6,6 +6,7 @@ pub mod donate_coins;
 pub mod fox;
 pub mod list_projects;
 pub mod members_count;
+pub mod meme;
 pub mod propose_project;
 pub mod register_wallet;
 pub mod say_hello;
