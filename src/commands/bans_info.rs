@@ -1,4 +1,4 @@
-use serenity::all::{Ban, CommandInteraction, Context, CreateCommand};
+use serenity::all::{Ban, CommandInteraction, Context, CreateCommand, Permissions};
 
 fn ban_message(ban: Ban) -> String {
     let user = ban.user.name;
@@ -31,4 +31,5 @@ pub async fn run(ctx: &Context, command: &CommandInteraction) -> String {
 pub fn register() -> CreateCommand {
     CreateCommand::new("bans_info")
         .description("Devuelve un detalle de los miembros baneados del servidor 🌍")
+        .default_member_permissions(Permissions::ADMINISTRATOR)
 }
