@@ -10,7 +10,7 @@ use axum::{middleware, Router};
 
 use crate::wallet::services::WalletService;
 
-use super::{health_check, reminders, scraping, wallet};
+use super::{book_club, health_check, reminders, scraping, wallet};
 
 #[derive(Clone, Debug)]
 pub struct RouterSecrets {
@@ -48,6 +48,7 @@ pub fn build_router(secrets: RouterSecrets, state: RouterState) -> Router {
         .nest("/scraping", scraping::build_router())
         .nest("/reminder", reminders::build_router())
         .nest("/wallet", wallet::build_router())
+        .nest("/book-club", book_club::build_router())
         .layer(middleware::from_fn_with_state(secrets, api_key_strategy))
         .route("/hello-chad", get(health_check::hello_chad))
         .with_state(state)

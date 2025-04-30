@@ -1,3 +1,4 @@
+mod book;
 mod bot;
 mod commands;
 mod consts;
