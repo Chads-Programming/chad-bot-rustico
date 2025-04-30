@@ -1,3 +1,4 @@
+pub mod book_club;
 pub mod health_check;
 pub mod reminders;
 pub mod scraping;
